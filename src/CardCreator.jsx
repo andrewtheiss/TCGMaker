@@ -3,13 +3,16 @@ import html2canvas from 'html2canvas';
 import beanImage from './assets/bean.png';
 import cardogImage from './assets/jade.png';
 import gatePowerImage from './assets/gatepower.png';
+import izkWhiteImage from './assets/ikz_white.png';
+import CardElements from './CardElements';
 
 const CardCreator = () => {
   const [cardData, setCardData] = useState({
     name: 'Card Name',
-    cost: '5',
+    cardColor: 'purp',
     type: 'creature',
-    subtype: 'Elder, Warrior',
+    subtype: 'Elder Warrior',
+    showSubtype: true,
     textBox: 'Card ability text goes here.',
     power: '3',
     toughness: '4',
@@ -28,7 +31,8 @@ const CardCreator = () => {
     footerLeft: 'STT 01-069',
     footerCenter: 'BBB',
     footerRarity: 'U',
-    copyrightText: 'Your Name Here'
+    copyrightText: 'Your Name Here',
+    elementMode: 'classic'
   });
 
   const [selectedElement, setSelectedElement] = useState(null);
@@ -51,6 +55,13 @@ const CardCreator = () => {
     fire: { primary: '#FF4500', secondary: '#DC143C', symbol: '🔥' },
     nature: { primary: '#228B22', secondary: '#32CD32', symbol: '🌿' },
     gray: { primary: '#808080', secondary: '#A9A9A9', symbol: '⚙️' }
+  };
+
+  const cardColors = {
+    purp: { bg: '#6c449a', fg: '#dc8fc7' },
+    yellow: { bg: '#ca722b', fg: '#ffbf2e' },
+    smoke: { bg: '#686463', fg: '#cec5c0' },
+    blue: { bg: '#5289c9', fg: '#75d0e2' }
   };
 
   const rarityColors = {
@@ -116,7 +127,8 @@ const CardCreator = () => {
         cursor: 'pointer',
         transition: 'all 0.3s',
         outline: selectedElement === elementType ? '2px solid #3b82f6' : 'none',
-        outlineOffset: '2px',
+        outlineOffset: '0px',
+        marginLeft: '-0px',
         ...style
       }}
       onClick={() => setSelectedElement(elementType)}
@@ -173,14 +185,45 @@ const CardCreator = () => {
           />
         )}
         
-        {selectedElement === 'cost' && (
-          <input
-            type="text"
-            value={cardData.cost}
-            onChange={(e) => updateCardData('cost', e.target.value)}
-            style={inputStyle}
-            placeholder="Cost"
-          />
+        {selectedElement === 'cardColor' && (
+          <div>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Card Color
+            </label>
+            {Object.entries(cardColors).map(([colorKey, colorConfig]) => (
+              <button
+                key={colorKey}
+                onClick={() => updateCardData('cardColor', colorKey)}
+                style={{
+                  ...inputStyle,
+                  backgroundColor: cardData.cardColor === colorKey ? '#e5e7eb' : '#f9fafb',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  marginBottom: '4px'
+                }}
+              >
+                <span style={{ textTransform: 'capitalize' }}>{colorKey}</span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    backgroundColor: colorConfig.bg,
+                    border: '1px solid #ccc'
+                  }} />
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    backgroundColor: colorConfig.fg,
+                    border: '1px solid #ccc'
+                  }} />
+                </div>
+              </button>
+            ))}
+          </div>
         )}
         
         {selectedElement === 'leftIcon' && (
@@ -218,15 +261,43 @@ const CardCreator = () => {
         )}
         
         {selectedElement === 'type' && (
-          <select
-            value={cardData.type}
-            onChange={(e) => updateCardData('type', e.target.value)}
-            style={inputStyle}
-          >
-            <option value="creature">Creature</option>
-            <option value="equipment">Equipment</option>
-            <option value="spell">Spell</option>
-          </select>
+          <div>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px' }}>
+              Card Type
+            </label>
+            <input
+              type="text"
+              value={cardData.type}
+              onChange={(e) => updateCardData('type', e.target.value)}
+              style={inputStyle}
+              placeholder="creature, spell, equipment, etc."
+            />
+            
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px', marginTop: '8px' }}>
+              <input
+                type="checkbox"
+                checked={cardData.showSubtype}
+                onChange={(e) => updateCardData('showSubtype', e.target.checked)}
+                style={{ marginRight: '8px' }}
+              />
+              Show Subtype (creature details)
+            </label>
+            
+            {cardData.showSubtype && (
+              <>
+                <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px' }}>
+                  Subtype
+                </label>
+                <input
+                  type="text"
+                  value={cardData.subtype}
+                  onChange={(e) => updateCardData('subtype', e.target.value)}
+                  style={inputStyle}
+                  placeholder="Elder Warrior, etc."
+                />
+              </>
+            )}
+          </div>
         )}
         
         {selectedElement === 'domain' && (
@@ -306,15 +377,7 @@ const CardCreator = () => {
           </div>
         )}
         
-        {selectedElement === 'subtype' && (
-          <input
-            type="text"
-            value={cardData.subtype}
-            onChange={(e) => updateCardData('subtype', e.target.value)}
-            style={inputStyle}
-            placeholder="Subtype"
-          />
-        )}
+
         
         {selectedElement === 'rarity' && (
           <div>
@@ -428,6 +491,50 @@ const CardCreator = () => {
           />
         )}
         
+        {selectedElement === 'elementMode' && (
+          <div>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Element Display Mode
+            </label>
+            {['classic', 'modern', 'minimal'].map((mode) => (
+              <button
+                key={mode}
+                onClick={() => updateCardData('elementMode', mode)}
+                style={{
+                  ...inputStyle,
+                  backgroundColor: cardData.elementMode === mode ? '#3b82f6' : '#f9fafb',
+                  color: cardData.elementMode === mode ? 'white' : 'black',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  marginBottom: '4px',
+                  textTransform: 'capitalize'
+                }}
+              >
+                <span>{mode}</span>
+                <span style={{ fontSize: '12px', opacity: 0.7 }}>
+                  {mode === 'classic' && 'Traditional diamond shapes'}
+                  {mode === 'modern' && 'Rounded, colorful styling'}
+                  {mode === 'minimal' && 'Clean, simple design'}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {selectedElement === 'bottomBorder' && (
+          <div>
+            <p style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
+              Extended Bottom Border (only visible when Full Art is OFF)
+            </p>
+            <p style={{ fontSize: '12px', color: '#888' }}>
+              This border provides additional visual weight to the bottom of the card.
+              Height: {102 * scale}px (double the standard border)
+            </p>
+          </div>
+        )}
+        
         <button onClick={() => setSelectedElement(null)} style={buttonStyle}>
           Close
         </button>
@@ -435,7 +542,7 @@ const CardCreator = () => {
     );
   };
 
-  const domainConfig = domainColors[cardData.domain];
+  const cardConfig = cardColors[cardData.cardColor];
 
   const textShadowStyle = {
     textShadow: `
@@ -473,17 +580,18 @@ const CardCreator = () => {
 
   const artCheckerboardPattern = {
     backgroundImage: `
-      linear-gradient(45deg, #bbb 25%, transparent 25%),
-      linear-gradient(-45deg, #bbb 25%, transparent 25%),
-      linear-gradient(45deg, transparent 75%, #bbb 75%),
-      linear-gradient(-45deg, transparent 75%, #bbb 75%)
+      linear-gradient(45deg, #ccc 25%, transparent 25%),
+      linear-gradient(-45deg, #ccc 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #ccc 75%),
+      linear-gradient(-45deg, transparent 75%, #ccc 75%)
     `,
-    backgroundSize: '12px 12px',
-    backgroundPosition: '0 0, 0 6px, 6px -6px, -6px 0px',
-    backgroundColor: '#eee'
+    backgroundSize: '20px 20px',
+    backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
+    backgroundColor: '#fff'
   };
 
   return (
+    <>
     <div style={{ minHeight: '100vh', backgroundColor: '#1f2937', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
       <input
         ref={fileInputRef}
@@ -529,130 +637,131 @@ const CardCreator = () => {
             )}
           </div>
           
-          {/* Card Border */}
-          {!cardData.fullArt && (
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: 'black',
-              borderRadius: `${64 * scale}px`,
-              zIndex: 5
-            }} />
-          )}
+
           
-                      {/* Main Card Area */}
+                                {/* Header - Absolutely positioned */}
+          <div className="card-header-container" style={{
+            position: 'absolute',
+            top: `${47 * scale}px`,
+            left: `${104 * scale}px`,
+            right: `${104 * scale}px`,
+            height: `${128 * scale}px`,
+            backgroundColor: cardData.fullArt ? 'transparent' : 'black',
+            color: 'white',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: `${32 * scale}px`,
+            zIndex: 15,
+            borderRadius: cardData.fullArt ? '0' : `${48 * scale}px ${48 * scale}px 0 0`
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: `${16 * scale}px`, position: 'relative' }}>
+              {/* Connecting background when both are present */}
+              {cardData.cardColor && cardData.leftIcon && (
+                <div style={{
+                  position: 'absolute',
+                  borderRadius: `${80 * scale}px`,
+                  backgroundColor: cardColors[cardData.cardColor].fg,
+                  left: `${-16 * scale}px`,
+                  right: `${-16 * scale}px`,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  height: `${160 * scale}px`
+                }} />
+              )}
+           
+              {/* Card Color bubble */}
+              <CardElement elementType="cardColor">
+                <div style={{
+                  width: `${160 * scale}px`,
+                  height: `${160 * scale}px`,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  zIndex: 10,
+                  backgroundColor: cardColors[cardData.cardColor].bg,
+                  border: `${8 * scale}px solid white`,
+                  overflow: 'hidden'
+                }}>
+               <img 
+                 src={izkWhiteImage}
+                 alt="IZK"
+                 style={{
+                   width: '80%',
+                   height: '80%',
+                   objectFit: 'contain'
+                 }}
+               />
+             </div>
+           </CardElement>
+           
+              {/* Left Icon */}
+              {cardData.leftIcon && (
+                <CardElement elementType="leftIcon">
+                  <div style={{
+                    width: `${160 * scale}px`,
+                    height: `${160 * scale}px`,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: `${56 * scale}px`,
+                    fontWeight: 'bold',
+                    color: 'white',
+                    position: 'relative',
+                    zIndex: 10,
+                    backgroundColor: cardColors[cardData.cardColor].bg,
+                    border: `${8 * scale}px solid white`,
+                    ...helveticaFont
+                  }}>
+                 {cardData.leftIcon}
+               </div>
+             </CardElement>
+           )}
+         </div>
+         
+            {/* Card Name */}
+            <CardElement elementType="name" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: `${80 * scale}px`, minWidth: `${cardWidth * 0.4 * scale}px` }}>
+              <h2 style={{ fontSize: `${92 * scale}px`, fontWeight: 'bold', margin: 0, lineHeight: `${80 * scale}px`, textAlign: 'center', ...helveticaFont }}>
+                {cardData.name}
+              </h2>
+            </CardElement>
+         
+            {/* Right Icon */}
+            <CardElement elementType="rightIcon">
+              <div style={{
+                width: `${160 * scale}px`,
+                height: `${160 * scale}px`,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: `${56 * scale}px`,
+                fontWeight: 'bold',
+                color: 'white',
+                backgroundColor: cardColors[cardData.cardColor].bg,
+                border: `${8 * scale}px solid white`,
+                ...helveticaFont
+              }}>
+             {cardData.rightIcon}
+           </div>
+         </CardElement>
+       </div>
+
+          {/* Main Card Area - Art positioning stays consistent */}
             <div style={{
               position: 'absolute',
-              top: cardData.fullArt ? 0 : `${44 * scale}px`,
-              right: cardData.fullArt ? 0 : `${56 * scale}px`,
-              bottom: cardData.fullArt ? 0 : `${56 * scale}px`,
-              left: cardData.fullArt ? 0 : `${56 * scale}px`,
-              borderRadius: `${48 * scale}px`,
+              top: `${128 * scale}px`,
+              right: 0,
+              bottom: 0,
+              left: 0,
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
-              zIndex: 10
+              zIndex: 1
             }}>
-                           {/* Header */}
-               <div style={{
-                 backgroundColor: 'black',
-                 color: 'white',
-                 padding: `${4 * scale}px ${48 * scale}px`,
-                 display: 'flex',
-                 justifyContent: 'space-between',
-                 alignItems: 'center',
-                 gap: `${32 * scale}px`,
-                 height: `${128 * scale}px`
-               }}>
-                               <div style={{ display: 'flex', alignItems: 'center', gap: `${16 * scale}px`, position: 'relative' }}>
-                   {/* Connecting background when both are present */}
-                   {cardData.cost && cardData.leftIcon && (
-                     <div style={{
-                       position: 'absolute',
-                       borderRadius: `${80 * scale}px`,
-                       backgroundColor: domainColors[cardData.rightIconColor].secondary,
-                       left: `${-16 * scale}px`,
-                       right: `${-16 * scale}px`,
-                       top: '50%',
-                       transform: 'translateY(-50%)',
-                       height: `${160 * scale}px`
-                     }} />
-                   )}
-                
-                                   {/* Cost bubble */}
-                   <CardElement elementType="cost">
-                     <div style={{
-                       width: `${160 * scale}px`,
-                       height: `${160 * scale}px`,
-                       borderRadius: '50%',
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center',
-                       fontWeight: 'bold',
-                       fontSize: `${72 * scale}px`,
-                       color: 'white',
-                       position: 'relative',
-                       zIndex: 10,
-                       backgroundColor: domainColors[cardData.rightIconColor].primary,
-                       border: `${8 * scale}px solid white`,
-                       ...helveticaFont
-                     }}>
-                    {cardData.cost}
-                  </div>
-                </CardElement>
-                
-                                   {/* Left Icon */}
-                   {cardData.leftIcon && (
-                     <CardElement elementType="leftIcon">
-                       <div style={{
-                         width: `${160 * scale}px`,
-                         height: `${160 * scale}px`,
-                         borderRadius: '50%',
-                         display: 'flex',
-                         alignItems: 'center',
-                         justifyContent: 'center',
-                         fontSize: `${56 * scale}px`,
-                         fontWeight: 'bold',
-                         color: 'white',
-                         position: 'relative',
-                         zIndex: 10,
-                         backgroundColor: domainColors[cardData.rightIconColor].primary,
-                         border: `${8 * scale}px solid white`,
-                         ...helveticaFont
-                       }}>
-                      {cardData.leftIcon}
-                    </div>
-                  </CardElement>
-                )}
-              </div>
-              
-                               {/* Card Name */}
-                 <CardElement elementType="name" style={{ flex: 1, display: 'flex', alignItems: 'center', height: `${80 * scale}px` }}>
-                   <h2 style={{ fontSize: `${92 * scale}px`, fontWeight: 'bold', margin: 0, lineHeight: `${80 * scale}px`, ...helveticaFont }}>
-                     {cardData.name}
-                   </h2>
-                 </CardElement>
-              
-                               {/* Right Icon */}
-                 <CardElement elementType="rightIcon">
-                   <div style={{
-                     width: `${160 * scale}px`,
-                     height: `${160 * scale}px`,
-                     borderRadius: '50%',
-                     display: 'flex',
-                     alignItems: 'center',
-                     justifyContent: 'center',
-                     fontSize: `${56 * scale}px`,
-                     fontWeight: 'bold',
-                     color: 'white',
-                     backgroundColor: domainColors[cardData.rightIconColor].primary,
-                     border: `${8 * scale}px solid white`,
-                     ...helveticaFont
-                   }}>
-                  {cardData.rightIcon}
-                </div>
-              </CardElement>
-            </div>
             
             {/* Art Box - Main viewing area */}
             <CardElement elementType="background" style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
@@ -661,138 +770,55 @@ const CardCreator = () => {
               )}
               <div style={{ width: '100%', height: '100%', backgroundColor: 'transparent', position: 'relative', zIndex: 10 }} />
             </CardElement>
-            
-                           {/* Text Box Area - positioned at bottom */}
-               <div style={{ position: 'relative', marginTop: `${-560 * scale}px` }}>
-                               {/* Rarity Stamp - positioned above text area */}
-                 <CardElement elementType="rarity">
-                   <div style={{
-                     position: 'absolute',
-                     left: `${96 * scale}px`,
-                     width: `${128 * scale}px`,
-                     height: `${128 * scale}px`,
-                     borderRadius: '50%',
-                     display: 'flex',
-                     alignItems: 'center',
-                     justifyContent: 'center',
-                     color: 'white',
-                     fontWeight: 'bold',
-                     fontSize: `${48 * scale}px`,
-                     zIndex: 10,
-                     backgroundColor: rarityColors[cardData.rarity],
-                     ...helveticaFont,
-                     top: `${-40 * scale}px`
-                   }}>
-                  α
-                </div>
-              </CardElement>
-              
-                <div style={{
-                   backgroundColor: cardData.fullArt ? 'transparent' : 'rgba(255, 255, 255, 0.5)',
-                   borderRadius: cardData.fullArt ? '0' : `${32 * scale}px`,
-                   margin: `0 ${48 * scale}px`,
-                   padding: `${64 * scale}px ${48 * scale}px ${320 * scale}px ${48 * scale}px`,
-                   paddingRight: cardData.type === 'creature' || cardData.type === 'equipment' ? `${240 * scale}px` : `${48 * scale}px`,
-                   marginBottom: `${144 * scale}px`,
-                   position: 'relative'
-                 }}>
-                                   <CardElement elementType="textBox">
-                     <p style={{
-                       fontSize: `${56 * scale}px`,
-                       margin: 0,
-                       color: 'black',
-                       ...(cardData.fullArt ? { ...helveticaFont, ...textShadowStyle } : helveticaFont)
-                     }}>
-                    {cardData.textBox}
-                  </p>
-                </CardElement>
-                
-
-              </div>
-              
-              {/* Type Line - At very bottom */}
-              <div style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '24px',
-                bottom: '26px'
-              }}>
-                <div style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}>
-                  {/* Left diamond edge */}
-                  <div style={{
-                    height: '100%',
-                    width: '12px',
-                    backgroundColor: domainConfig.secondary,
-                    clipPath: 'polygon(0 50%, 100% 0, 100% 100%)'
-                  }} />
-                  
-                  {/* Main type bar */}
-                  <div style={{
-                    height: '100%',
-                    padding: '0 40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    textAlign: 'center',
-                    whiteSpace: 'nowrap',
-                    backgroundColor: domainConfig.secondary,
-                    color: 'white',
-                    ...helveticaFont
-                  }}>
-                    <CardElement elementType="type" style={{ display: 'inline' }}>
-                      <span style={{ textTransform: 'capitalize' }}>{cardData.type}</span>
-                    </CardElement>
-                    {cardData.subtype && (
-                      <>
-                        <span style={{ margin: '0 8px' }}>—</span>
-                        <CardElement elementType="subtype" style={{ display: 'inline' }}>
-                          <span>{cardData.subtype}</span>
-                        </CardElement>
-                      </>
-                    )}
-                  </div>
-                  
-                  {/* Right diamond edge */}
-                  <div style={{
-                    height: '100%',
-                    width: '12px',
-                    backgroundColor: domainConfig.secondary,
-                    clipPath: 'polygon(0 0, 100% 50%, 0 100%)'
-                  }} />
-                </div>
-              </div>
-              
-
-              
-              {/* Bottom diagonal corners */}
-              <div>
-                <div style={{
-                  position: 'absolute',
-                  width: '32px',
-                  height: '32px',
-                  backgroundColor: 'black',
-                  bottom: cardData.fullArt ? '-20px' : '6px',
-                  left: cardData.fullArt ? '-20px' : '0px',
-                  clipPath: 'polygon(0 100%, 0 0, 100% 100%)'
-                }} />
-                
-                <div style={{
-                  position: 'absolute',
-                  width: '32px',
-                  height: '32px',
-                  backgroundColor: 'black',
-                  bottom: cardData.fullArt ? '-20px' : '5px',
-                  right: cardData.fullArt ? '-20px' : '0px',
-                  clipPath: 'polygon(100% 100%, 0 100%, 100% 0)'
-                }} />
-              </div>
-            </div>
           </div>
+
+          {/* Bottom diagonal corners - absolutely positioned independent container */}
+          <div 
+            className="card-corner-triangles"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              pointerEvents: 'none',
+              zIndex: 25
+            }}
+          >
+            <div 
+              className="card-triangle-left bottom-border-left" 
+              style={{
+                position: 'absolute',
+                width: `${150 * scale}px`,
+                height: `${150 * scale}px`,
+                backgroundColor: 'black',
+                bottom: cardData.fullArt ? `${-200 * scale}px` : `${57 * scale}px`,
+                left: cardData.fullArt ? `${-200 * scale}px` : `${56 * scale}px`,
+                clipPath: 'polygon(0 100%, 0 0, 100% 100%)',
+                display: 'block',
+                visibility: 'visible',
+                opacity: 1
+              }} 
+            />
+            
+            <div 
+              className="card-triangle-right bottom-border-right" 
+              style={{
+                position: 'absolute',
+                width: `${150 * scale}px`,
+                height: `${150 * scale}px`,
+                backgroundColor: 'black',
+                bottom: cardData.fullArt ? `${-200 * scale}px` : `${56 * scale}px`,
+                right: cardData.fullArt ? `${-200 * scale}px` : `${56 * scale}px`,
+                clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
+                display: 'block',
+                visibility: 'visible',
+                opacity: 1
+              }} 
+            />
+          </div>
+          
+
           
           {/* Gate Power Overlay - Left Side, Top Layer */}
           <CardElement elementType="gatePower" style={{
@@ -816,7 +842,7 @@ const CardCreator = () => {
                 transform: 'translate(-50%, calc(-50% - 1px))',
                 width: `${195 * scale}px`,
                 height: `${195 * scale}px`,
-                backgroundColor: domainColors[cardData.domain].primary,
+                backgroundColor: cardColors[cardData.cardColor].bg,
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
@@ -846,6 +872,8 @@ const CardCreator = () => {
               />
             </div>
           </CardElement>
+
+
 
           {/* Footer text - positioned relative to card edges */}
           <div style={{
@@ -962,97 +990,82 @@ const CardCreator = () => {
             </div>
           </CardElement>
 
-          {/* Power/Toughness for creatures - positioned absolutely to card */}
-          {cardData.type === 'creature' && (
-            <CardElement elementType="stats">
-              <div style={{
+          {/* Rarity Stamp (Alpha Logo) - positioned absolutely to card */}
+          <CardElement elementType="rarity">
+            <div style={{
+              position: 'absolute',
+              left: `${152 * scale}px`,
+              top: `${1100 * scale}px`,
+              width: `${128 * scale}px`,
+              height: `${128 * scale}px`,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: `${48 * scale}px`,
+              zIndex: 1010,
+              backgroundColor: rarityColors[cardData.rarity],
+              ...helveticaFont
+            }}>
+              α
+            </div>
+          </CardElement>
+
+          {/* Card Border - positioned absolutely to the outer edge */}
+          {!cardData.fullArt && (
+            <div 
+              className="card-border-frame"
+              style={{
                 position: 'absolute',
-                right: `${210 * scale}px`,
-                bottom: `${474 * scale}px`,
-                zIndex: 1003
-              }}>
-                {/* Power Box - Top */}
-                <div style={{
-                  width: `${128 * scale}px`,
-                  height: `${128 * scale}px`,
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+                backgroundColor: 'transparent',
+                borderTop: `${56 * scale}px solid black`,
+                borderLeft: `${56 * scale}px solid black`,
+                borderRight: `${56 * scale}px solid black`,
+                borderBottom: `${51 * scale}px solid black`,
+                borderRadius: `${64 * scale}px`,
+                zIndex: 10,
+                pointerEvents: 'none'
+              }} 
+            />
+          )}
+
+          {/* Additional Bottom Border - only when full-art is OFF */}
+          {!cardData.fullArt && (
+            <CardElement elementType="bottomBorder">
+              <div 
+                className="card-bottom-border-extended"
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: `${92 * scale}px`,
                   backgroundColor: 'black',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 'bold',
-                  transform: 'rotate(45deg)',
-                  borderRadius: `${11 * scale}px`,
-                  fontSize: `${95 * scale}px`,
-                  border: `${6 * scale}px solid white`,
-                  boxShadow: `0 0 0 ${7 * scale}px black`,
-                  ...helveticaFont,
-                  position: 'absolute',
-                  top: '-19px',
-                  left: 0,
-                  zIndex: 999
-                }}>
-                  <span style={{ transform: 'rotate(-45deg)' }}>{cardData.power}</span>
-                </div>
-                
-                {/* Toughness Box - Bottom */}
-                <div style={{
-                  width: `${128 * scale}px`,
-                  height: `${128 * scale}px`,
-                  backgroundColor: 'white',
-                  color: 'black',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 'bold',
-                  transform: 'rotate(45deg)',
-                  borderRadius: `${11 * scale}px`,
-                  fontSize: `${100 * scale}px`,
-                  border: `${6 * scale}px solid white`,
-                  boxShadow: `0 0 0 ${7 * scale}px black`,
-                  ...helveticaFont,
-                  position: 'absolute',
-                  top: `${134 * scale}px`,
-                  left: 0,
-                  zIndex: 999
-                }}>
-                  <span style={{ transform: 'rotate(-45deg)' }}>{cardData.toughness}</span>
-                </div>
-              </div>
+                  borderRadius: `0 0 ${64 * scale}px ${64 * scale}px`,
+                  zIndex: 15,
+                  pointerEvents: 'auto'
+                }} 
+              />
             </CardElement>
           )}
 
-          {/* Equipment cost diamond - positioned absolutely to card */}
-          {cardData.type === 'equipment' && (
-            <CardElement elementType="stats">
-              <div style={{
-                position: 'absolute',
-                right: `${100 * scale}px`,
-                bottom: `${180 * scale}px`,
-                zIndex: 1003
-              }}>
-                <div style={{
-                  width: `${128 * scale}px`,
-                  height: `${128 * scale}px`,
-                  backgroundColor: 'black',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 'bold',
-                  transform: 'rotate(45deg)',
-                  borderRadius: `${16 * scale}px`,
-                  fontSize: `${80 * scale}px`,
-                  border: `${8 * scale}px solid white`,
-                  boxShadow: `0 0 0 ${7 * scale}px black`,
-                  ...helveticaFont,
-                  zIndex: 999
-                }}>
-                  <span style={{ transform: 'rotate(-45deg)' }}>2</span>
-                </div>
-              </div>
-            </CardElement>
-          )}
+          {/* CardElements component - handles type line, horizontal bar, text box, and stats */}
+          <CardElements 
+            cardData={cardData}
+            CardElement={CardElement}
+            cardColors={cardColors}
+            helveticaFont={helveticaFont}
+            textShadowStyle={textShadowStyle}
+            scale={scale}
+            cardWidth={cardWidth}
+            mode={cardData.elementMode}
+          />
         </div>
         
         {/* Reference Overlay */}
@@ -1128,6 +1141,22 @@ const CardCreator = () => {
           {cardData.overlayImage ? 'Change Reference' : 'Upload Reference'}
         </button>
         
+        <button
+          onClick={() => setSelectedElement('elementMode')}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#7c3aed',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '500'
+          }}
+        >
+          🎨 Mode: {cardData.elementMode}
+        </button>
+        
         {cardData.overlayImage && (
           <button
             onClick={() => setShowOverlay(!showOverlay)}
@@ -1159,6 +1188,7 @@ const CardCreator = () => {
         <p style={{ margin: 0 }}>Click any element on the card to edit it</p>
       </div>
     </div>
+    </>
   );
 };
 
