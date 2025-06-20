@@ -401,15 +401,201 @@ const CardCreator = () => {
         )}
         
         {selectedElement === 'abilityText' && (
-          <textarea
-            value={cardData.textBox}
-            onChange={(e) => updateCardData('textBox', e.target.value)}
-            style={{ ...inputStyle, height: '128px', resize: 'vertical' }}
-            placeholder="Card ability text..."
-          />
+          <div>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Card Ability Text
+            </label>
+            
+            {/* Special Keywords Buttons */}
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ fontSize: '12px', color: '#666', display: 'block', marginBottom: '6px' }}>
+                Special Keywords (click to insert):
+              </label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '8px' }}>
+                <button
+                  onClick={() => {
+                    const textarea = document.querySelector('textarea');
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = cardData.textBox.substring(0, cursorPos);
+                    const textAfter = cardData.textBox.substring(cursorPos);
+                    updateCardData('textBox', textBefore + '%onceaturn%' + textAfter);
+                  }}
+                  style={{
+                    backgroundColor: '#ff6b6b',
+                    color: 'white',
+                    borderRadius: '6px',
+                    padding: '2px 6px',
+                    fontSize: '8px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ONCE A TURN
+                </button>
+                
+                <button
+                  onClick={() => {
+                    const textarea = document.querySelector('textarea');
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = cardData.textBox.substring(0, cursorPos);
+                    const textAfter = cardData.textBox.substring(cursorPos);
+                    updateCardData('textBox', textBefore + '%whenattacking%' + textAfter);
+                  }}
+                  style={{
+                    backgroundColor: '#ffd93d',
+                    color: '#333',
+                    borderRadius: '6px',
+                    padding: '2px 6px',
+                    fontSize: '8px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  WHEN ATTACKING
+                </button>
+                
+                <button
+                  onClick={() => {
+                    const textarea = document.querySelector('textarea');
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = cardData.textBox.substring(0, cursorPos);
+                    const textAfter = cardData.textBox.substring(cursorPos);
+                    updateCardData('textBox', textBefore + '%tap%' + textAfter);
+                  }}
+                  style={{
+                    backgroundColor: '#95a5a6',
+                    color: 'white',
+                    borderRadius: '50%',
+                    padding: '2px 4px',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    minWidth: '16px',
+                    textAlign: 'center',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ⟲
+                </button>
+                
+                <button
+                  onClick={() => {
+                    const textarea = document.querySelector('textarea');
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = cardData.textBox.substring(0, cursorPos);
+                    const textAfter = cardData.textBox.substring(cursorPos);
+                    updateCardData('textBox', textBefore + '%defender%' + textAfter);
+                  }}
+                  style={{
+                    backgroundColor: '#3498db',
+                    color: 'white',
+                    borderRadius: '6px',
+                    padding: '2px 6px',
+                    fontSize: '8px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  DEFENDER
+                </button>
+                
+                <button
+                  onClick={() => {
+                    const textarea = document.querySelector('textarea');
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = cardData.textBox.substring(0, cursorPos);
+                    const textAfter = cardData.textBox.substring(cursorPos);
+                    updateCardData('textBox', textBefore + '%onplay%' + textAfter);
+                  }}
+                  style={{
+                    backgroundColor: '#4285f4',
+                    color: 'white',
+                    borderRadius: '8px',
+                    padding: '2px 6px',
+                    fontSize: '8px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ON PLAY
+                </button>
+              </div>
+              
+              {/* Text Formatting Buttons */}
+              <label style={{ fontSize: '12px', color: '#666', display: 'block', marginBottom: '6px' }}>
+                Text Formatting:
+              </label>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                <button
+                  onClick={() => {
+                    const textarea = document.querySelector('textarea');
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = cardData.textBox.substring(0, cursorPos);
+                    const textAfter = cardData.textBox.substring(cursorPos);
+                    updateCardData('textBox', textBefore + '*text*' + textAfter);
+                  }}
+                  style={{
+                    ...inputStyle,
+                    height: 'auto',
+                    padding: '4px 8px',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    backgroundColor: '#f8f9fa',
+                    border: '1px solid #dee2e6',
+                    marginBottom: '0'
+                  }}
+                >
+                  *Bold*
+                </button>
+                
+                <button
+                  onClick={() => {
+                    const textarea = document.querySelector('textarea');
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = cardData.textBox.substring(0, cursorPos);
+                    const textAfter = cardData.textBox.substring(cursorPos);
+                    updateCardData('textBox', textBefore + '$text$' + textAfter);
+                  }}
+                  style={{
+                    ...inputStyle,
+                    height: 'auto',
+                    padding: '4px 8px',
+                    fontSize: '10px',
+                    fontStyle: 'italic',
+                    textDecoration: 'underline',
+                    backgroundColor: '#f8f9fa',
+                    border: '1px solid #dee2e6',
+                    marginBottom: '0'
+                  }}
+                >
+                  $Italic$
+                </button>
+              </div>
+            </div>
+
+            <textarea
+              value={cardData.textBox}
+              onChange={(e) => updateCardData('textBox', e.target.value)}
+              style={{ ...inputStyle, height: '120px', resize: 'vertical', fontFamily: 'monospace', fontSize: '11px' }}
+              placeholder="Type here or use buttons above to insert formatting...
+
+Example: %onplay% *Summon* a 2/2 $defender$ token."
+            />
+            <div style={{ fontSize: '11px', color: '#888', marginTop: '4px' }}>
+              ✨ Live preview on card! Changes appear instantly with formatted styling.
+            </div>
+          </div>
         )}
         
-        {selectedElement === 'stats' && cardData.type === 'creature' && (
+        {selectedElement === 'stats' && (
           <div>
             <input
               type="text"
@@ -1610,6 +1796,7 @@ const CardCreator = () => {
             scale={scale}
             cardWidth={cardWidth}
             mode={cardData.elementMode}
+            updateCardData={updateCardData}
           />
         </div>
         

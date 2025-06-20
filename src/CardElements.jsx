@@ -1,4 +1,5 @@
 import React from 'react';
+import CardAbilityText from './CardAbilityText';
 
 const CardElements = ({ 
   cardData, 
@@ -8,7 +9,8 @@ const CardElements = ({
   textShadowStyle, 
   scale, 
   cardWidth,
-  mode = 'classic' // 'classic', 'modern', 'minimal'
+  mode = 'classic', // 'classic', 'modern', 'minimal'
+  updateCardData
 }) => {
   
   // Define mode-specific styles - all modes are same as classic for now
@@ -124,47 +126,16 @@ const CardElements = ({
       }} />
 
       {/* Card Ability Text - positioned absolutely to card */}
-      <CardElement elementType="abilityText">
-        <div style={{
-          position: 'absolute',
-          left: cardData.fullArt ? `${85 * scale}px` : `${85 * scale}px`,
-          right: cardData.type === 'creature' || cardData.type === 'equipment' ? `${85 * scale}px` : `${85 * scale}px`,
-          top: `${1326 * scale}px`,
-          bottom: `${180 * scale}px`,
-          backgroundColor: currentMode.textBox.backgroundColor,
-          borderRadius: currentMode.textBox.borderRadius,
-          padding: currentMode.textBox.padding,
-          textAlign: 'justify',
-          zIndex: 1005,
-          pointerEvents: 'auto',
-          border: '0px solid black'
-        }}>
-          <p style={{
-            fontSize: `${50 * scale}px`,
-            lineHeight: `${70 * scale}px`,
-            margin: '-5px -3px',
-                         color: 'black',
-             fontWeight: '600',
-             textShadow: cardData.fullArt ? `
-               -1px -1px 0 white,
-               1px -1px 0 white,
-               -1px 1px 0 white,
-               1px 1px 0 white,
-               0 1px 0 white,
-               1px 0 0 white,
-               0 -1px 0 white,
-               -1px 0 0 white
-             ` : 'none',
-             ...helveticaFont
-          }}>
-            {cardData.textBox}
-          </p>
-        </div>
-      </CardElement>
+      <CardAbilityText 
+        cardData={cardData}
+        CardElement={CardElement}
+        currentMode={currentMode}
+        scale={scale}
+        helveticaFont={helveticaFont}
+      />
 
-      {/* Power/Toughness for creatures - positioned absolutely to card */}
-      {cardData.type === 'creature' && (
-        <CardElement elementType="stats">
+      {/* Power/Toughness stats - positioned absolutely to card */}
+      <CardElement elementType="stats">
           <div style={{
             position: 'absolute',
             right: `${210 * scale}px`,
@@ -275,7 +246,6 @@ const CardElements = ({
             </div>
           </div>
         </CardElement>
-      )}
 
       {/* Equipment cost diamond - positioned absolutely to card */}
       {cardData.type === 'equipment' && (
