@@ -36,6 +36,8 @@ const CardCreator = () => {
     footerCenter: 'BBB',
     footerRarity: 'U',
     copyrightText: 'Your Name Here',
+    raritySymbol: 'α',
+    showRarityStamp: true,
     elementMode: 'classic',
     circularText: 'ENTITY',
     showLeftIcons: true,
@@ -144,7 +146,12 @@ const CardCreator = () => {
           backgroundColor: null,
           logging: false,
           useCORS: true,
-          allowTaint: true
+          allowTaint: true,
+          ignoreElements: (element) => {
+            // Ignore edit panel and overlay elements
+            return element.classList.contains('edit-panel') || 
+                   element.style.zIndex > 1020;
+          }
         });
         
         const link = document.createElement('a');
@@ -181,16 +188,21 @@ const CardCreator = () => {
   const EditPanel = () => {
     if (!selectedElement) return null;
 
-    const panelStyle = {
+    const outerPanelStyle = {
       position: 'absolute',
       top: '50px',
       right: '16px',
+      padding: '3px', // This creates the border thickness
+      backgroundColor: 'rgba(0, 0, 0, 0.1)', // Border color
+      borderRadius: '11px', // Slightly larger radius for outer border
+      zIndex: 50,
+    };
+
+    const innerPanelStyle = {
       backgroundColor: 'white',
-      borderRadius: '8px',
-      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+      borderRadius: '8px', // Inner border radius
       padding: '16px',
       width: '256px',
-      zIndex: 50,
       ...helveticaFont
     };
 
@@ -213,8 +225,9 @@ const CardCreator = () => {
     };
 
     return (
-      <div style={panelStyle}>
-        <h3 style={{ fontWeight: 'bold', marginBottom: '12px' }}>Edit {selectedElement}</h3>
+      <div style={outerPanelStyle}>
+        <div style={innerPanelStyle}>
+          <h3 style={{ fontWeight: 'bold', marginBottom: '12px' }}>Edit {selectedElement}</h3>
         
         {selectedElement === 'cardName' && (
           <input
@@ -419,28 +432,45 @@ const CardCreator = () => {
         
         {selectedElement === 'rarity' && (
           <div>
-            {Object.entries(rarityColors).map(([rarity, color]) => (
-              <button
-                key={rarity}
-                onClick={() => updateCardData('rarity', rarity)}
-                style={{
-                  ...inputStyle,
-                  backgroundColor: cardData.rarity === rarity ? '#e5e7eb' : '#f9fafb',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  cursor: 'pointer'
-                }}
-              >
-                <span style={{ textTransform: 'capitalize' }}>{rarity}</span>
-                <div style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '50%',
-                  backgroundColor: color
-                }} />
-              </button>
-            ))}
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px', marginTop: '12px' }}>
+              <input
+                type="checkbox"
+                checked={cardData.showRarityStamp}
+                onChange={(e) => updateCardData('showRarityStamp', e.target.checked)}
+                style={{ marginRight: '8px' }}
+              />
+              Show Rarity Stamp
+            </label>
+            
+            {cardData.showRarityStamp && (
+              <>
+                <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px', marginTop: '12px' }}>
+                  Rarity Symbol
+                </label>
+                {[
+                  { symbol: 'α', name: 'Alpha' },
+                  { symbol: 'σ', name: 'Sigma' },
+                  { symbol: 'β', name: 'Beta' }
+                ].map(({ symbol, name }) => (
+                  <button
+                    key={symbol}
+                    onClick={() => updateCardData('raritySymbol', symbol)}
+                    style={{
+                      ...inputStyle,
+                      backgroundColor: cardData.raritySymbol === symbol ? '#e5e7eb' : '#f9fafb',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      marginBottom: '4px'
+                    }}
+                  >
+                    <span>{name}</span>
+                    <span style={{ fontSize: '20px', fontWeight: 'bold' }}>{symbol}</span>
+                  </button>
+                ))}
+              </>
+            )}
           </div>
         )}
         
@@ -639,6 +669,7 @@ const CardCreator = () => {
         <button onClick={() => setSelectedElement(null)} style={buttonStyle}>
           Close
         </button>
+        </div>
       </div>
     );
   };
@@ -945,11 +976,11 @@ const CardCreator = () => {
                 
                                   {/* CIRCULAR TEXT AREA - Text that curves around the outer perimeter */}
                   <CardElement elementType="circularText" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-                    {/* CIRCULAR TEXT STROKE - First render with black stroke outline */}
+                    {/* CIRCULAR TEXT STROKE LEFT - First render with black stroke outline (counter-clockwise) */}
                     <svg 
                       className="circular-text-stroke-svg"
                       width={`${220 * scale}px`} 
-                      height={`${220 * scale}px`} 
+                      height={`${520 * scale}px`} 
                       style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }}
                     >
                       <defs>
@@ -977,6 +1008,43 @@ const CardCreator = () => {
                         }}
                       >
                         <textPath href="#circle-path-stroke" startOffset={`${cardData.textRotation}%`}>
+                          {cardData.circularText || 'GATE'}
+                        </textPath>
+                      </text>
+                    </svg>
+
+                    {/* CIRCULAR TEXT STROKE RIGHT - Second render with black stroke outline (clockwise) */}
+                    <svg 
+                      className="circular-text-stroke-right-svg"
+                      width={`${220 * scale}px`} 
+                      height={`${520 * scale}px`} 
+                      style={{ position: 'absolute', top: 0, left: `${2 * scale}px`, zIndex: 1 }}
+                    >
+                      <defs>
+                                              <path 
+                        id="circle-path-stroke-right" 
+                        d={cardData.flipCircularText 
+                          ? `M ${109.99 * scale} ${20 * scale} A ${110 * scale} ${105 * scale} 0 1 0 ${110 * scale} ${20 * scale}`
+                          : `M ${110 * scale} ${20 * scale} A ${105 * scale} ${105 * scale} 0 1 1 ${109.99 * scale} ${20 * scale}`
+                        }
+                      />
+                      </defs>
+                      <text 
+                        className="circular-text-stroke-right"
+                        fontSize={`${40 * scale}px`} 
+                        fill="transparent"
+                        fontWeight="900"
+                        stroke="black"
+                        strokeWidth={`${14 * scale}px`}
+                        strokeLinejoin="round"
+                        strokeLinecap="round"
+                        style={{ 
+                          ...helveticaFont,
+                          fontWeight: '900',
+                          letterSpacing: `${6.975 * scale}px`
+                        }}
+                      >
+                        <textPath href="#circle-path-stroke-right" startOffset={`${cardData.textRotation - 1}%`}>
                           {cardData.circularText || 'GATE'}
                         </textPath>
                       </text>
@@ -1416,28 +1484,71 @@ const CardCreator = () => {
             </div>
           </CardElement>
 
-          {/* Rarity Stamp (Alpha Logo) - positioned absolutely to card */}
-          <CardElement elementType="rarity">
-            <div style={{
-              position: 'absolute',
-              left: `${152 * scale}px`,
-              top: `${1100 * scale}px`,
-              width: `${128 * scale}px`,
-              height: `${128 * scale}px`,
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontWeight: 'bold',
-              fontSize: `${48 * scale}px`,
-              zIndex: 1010,
-              backgroundColor: rarityColors[cardData.rarity],
-              ...helveticaFont
-            }}>
-              α
-            </div>
-          </CardElement>
+          {/* Rarity Stamp - positioned absolutely to card */}
+          {cardData.showRarityStamp ? (
+            <CardElement elementType="rarity">
+              <div 
+                style={{
+                  position: 'absolute',
+                  left: `${95 * scale}px`,
+                  top: `${1150 * scale}px`,
+                  width: `${128 * scale}px`,
+                  height: `${128 * scale}px`,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 'normal',
+                  fontSize: `${100 * scale}px`,
+                  zIndex: 1010,
+                  backgroundColor: 'black',
+                  paddingBottom: `${15 * scale}px`,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  outline: selectedElement === 'rarity' ? '2px solid #3b82f6' : 'none',
+                  ...helveticaFont
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedElement !== 'rarity') {
+                    e.currentTarget.style.outline = '2px dashed rgba(59, 130, 246, 0.7)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedElement !== 'rarity') {
+                    e.currentTarget.style.outline = 'none';
+                  }
+                }}
+                onClick={() => setSelectedElement('rarity')}
+              >
+                {cardData.raritySymbol}
+              </div>
+            </CardElement>
+          ) : (
+            /* Hidden rarity stamp mouseover area */
+            <div 
+              style={{
+                position: 'absolute',
+                left: `${95 * scale}px`,
+                top: `${1150 * scale}px`,
+                width: `${128 * scale}px`,
+                height: `${128 * scale}px`,
+                borderRadius: '50%',
+                cursor: 'pointer',
+                zIndex: 1010
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.outline = '3px dashed rgba(255,255,255,0.7)';
+                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.outline = 'none';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => updateCardData('showRarityStamp', true)}
+              title="Click to show rarity stamp"
+            />
+          )}
 
           {/* Card Border - positioned absolutely to the outer edge */}
           {!cardData.fullArt && (

@@ -63,14 +63,13 @@ const CardElements = ({
         pointerEvents: 'auto'
       }}>
         <div style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}>
-                     {/* Left diamond edge */}
-           <div style={{
-             height: '100%',
-             width: '12px',
-             backgroundColor: cardColors[cardData.cardColor].bg,
-             clipPath: 'polygon(0px 50%, 96% 0px, 100% 104%)',
-             marginLeft: '2px'
-           }} />
+          {/* Left triangle edge using SVG */}
+          <svg width="12" height={currentMode.typeLine.height} style={{ marginLeft: '2px' }}>
+            <polygon 
+              points={`-1,${parseFloat(currentMode.typeLine.height)/2} 11,-0.5 11,${currentMode.typeLine.height}`}
+              fill={cardColors[cardData.cardColor].bg}
+            />
+          </svg>
           
           {/* Main type bar */}
           <CardElement elementType="type" style={{ height: '100%' }}>
@@ -88,7 +87,7 @@ const CardElements = ({
               color: 'white',
               lineHeight: currentMode.typeLine.height,
               minWidth: '160px',
-                             margin: '0px -1px 0px -1px',
+              margin: '0px -1px 0px -1px',
               borderRadius: currentMode.typeLine.borderRadius,
               ...helveticaFont
             }}>
@@ -102,13 +101,15 @@ const CardElements = ({
             </div>
           </CardElement>
           
-                     {/* Right diamond edge */}
-           <div style={{
-             height: '100%',
-             width: '13px',
-             backgroundColor: cardColors[cardData.cardColor].bg,
-             clipPath: 'polygon(0px -1px, 100% 50%, 0px 104%)'
-           }} />
+          {/* Right triangle edge using SVG */}
+          <svg width="13" height={currentMode.typeLine.height}>
+            <polygon 
+              points={`0,-0.5 12,${parseFloat(currentMode.typeLine.height)/2} -0.5,${currentMode.typeLine.height
+
+              }`}
+              fill={cardColors[cardData.cardColor].bg}
+            />
+          </svg>
         </div>
       </div>
 
@@ -174,54 +175,102 @@ const CardElements = ({
           }}>
             {/* Power Box - Top */}
             <div style={{
-              width: `${128 * scale}px`,
-              height: `${128 * scale}px`,
-              backgroundColor: currentMode.statsDiamonds.powerBg,
-              color: currentMode.statsDiamonds.powerColor,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 'bold',
-              transform: currentMode.statsDiamonds.transform,
-              borderRadius: currentMode.statsDiamonds.borderRadius,
-              fontSize: `${95 * scale}px`,
-              border: `${6 * scale}px solid white`,
-                             boxShadow: `0 0 0 ${7 * scale}px black`,
-               ...helveticaFont,
-               position: 'absolute',
-               top: '-19px',
+              position: 'absolute',
+              top: '-19px',
               left: 0,
               zIndex: 999
             }}>
-              <span style={{ transform: 'rotate(-45deg)' }}>
-                {cardData.power}
-              </span>
+              {/* Outer black border */}
+              <div style={{
+                width: `${142 * scale}px`,
+                height: `${142 * scale}px`,
+                backgroundColor: 'black',
+                transform: currentMode.statsDiamonds.transform,
+                borderRadius: currentMode.statsDiamonds.borderRadius,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {/* White border */}
+                <div style={{
+                  width: `${128 * scale}px`,
+                  height: `${128 * scale}px`,
+                  backgroundColor: 'white',
+                  borderRadius: currentMode.statsDiamonds.borderRadius,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {/* Inner content */}
+                  <div style={{
+                    width: `${116 * scale}px`,
+                    height: `${116 * scale}px`,
+                    backgroundColor: currentMode.statsDiamonds.powerBg,
+                    color: currentMode.statsDiamonds.powerColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    borderRadius: currentMode.statsDiamonds.borderRadius,
+                    fontSize: `${95 * scale}px`,
+                    ...helveticaFont
+                  }}>
+                    <span style={{ transform: 'rotate(-45deg)' }}>
+                      {cardData.power}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
             
             {/* Toughness Box - Bottom */}
             <div style={{
-              width: `${128 * scale}px`,
-              height: `${128 * scale}px`,
-              backgroundColor: currentMode.statsDiamonds.toughnessBg,
-              color: currentMode.statsDiamonds.toughnessColor,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 'bold',
-              transform: currentMode.statsDiamonds.transform,
-              borderRadius: currentMode.statsDiamonds.borderRadius,
-              fontSize: `${100 * scale}px`,
-              border: `${6 * scale}px solid white`,
-              boxShadow: `0 0 0 ${7 * scale}px black`,
-              ...helveticaFont,
               position: 'absolute',
               top: `${134 * scale}px`,
               left: 0,
               zIndex: 999
             }}>
-              <span style={{ transform: 'rotate(-45deg)' }}>
-                {cardData.toughness}
-              </span>
+              {/* Outer black border */}
+              <div style={{
+                width: `${142 * scale}px`,
+                height: `${142 * scale}px`,
+                backgroundColor: 'black',
+                transform: currentMode.statsDiamonds.transform,
+                borderRadius: currentMode.statsDiamonds.borderRadius,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {/* White border */}
+                <div style={{
+                  width: `${128 * scale}px`,
+                  height: `${128 * scale}px`,
+                  backgroundColor: 'white',
+                  borderRadius: currentMode.statsDiamonds.borderRadius,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {/* Inner content */}
+                  <div style={{
+                    width: `${116 * scale}px`,
+                    height: `${116 * scale}px`,
+                    backgroundColor: currentMode.statsDiamonds.toughnessBg,
+                    color: currentMode.statsDiamonds.toughnessColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    borderRadius: currentMode.statsDiamonds.borderRadius,
+                    fontSize: `${100 * scale}px`,
+                    ...helveticaFont
+                  }}>
+                    <span style={{ transform: 'rotate(-45deg)' }}>
+                      {cardData.toughness}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </CardElement>
@@ -236,24 +285,46 @@ const CardElements = ({
             bottom: `${180 * scale}px`,
             zIndex: 1012
           }}>
-            <div style={{
-              width: `${128 * scale}px`,
-              height: `${128 * scale}px`,
-              backgroundColor: currentMode.statsDiamonds.powerBg,
-              color: currentMode.statsDiamonds.powerColor,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 'bold',
-              transform: currentMode.statsDiamonds.transform,
-              borderRadius: currentMode.statsDiamonds.borderRadius,
-              fontSize: `${80 * scale}px`,
-              border: `${8 * scale}px solid white`,
-              boxShadow: `0 0 0 ${7 * scale}px black`,
-              ...helveticaFont,
-              zIndex: 999
-            }}>
-              <span style={{ transform: 'rotate(-45deg)' }}>2</span>
+            <div style={{ zIndex: 999 }}>
+              {/* Outer black border */}
+              <div style={{
+                width: `${142 * scale}px`,
+                height: `${142 * scale}px`,
+                backgroundColor: 'black',
+                transform: currentMode.statsDiamonds.transform,
+                borderRadius: currentMode.statsDiamonds.borderRadius,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {/* White border */}
+                <div style={{
+                  width: `${128 * scale}px`,
+                  height: `${128 * scale}px`,
+                  backgroundColor: 'white',
+                  borderRadius: currentMode.statsDiamonds.borderRadius,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {/* Inner content */}
+                  <div style={{
+                    width: `${112 * scale}px`,
+                    height: `${112 * scale}px`,
+                    backgroundColor: currentMode.statsDiamonds.powerBg,
+                    color: currentMode.statsDiamonds.powerColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    borderRadius: currentMode.statsDiamonds.borderRadius,
+                    fontSize: `${80 * scale}px`,
+                    ...helveticaFont
+                  }}>
+                    <span style={{ transform: 'rotate(-45deg)' }}>2</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </CardElement>
