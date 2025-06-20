@@ -892,12 +892,14 @@ const CardCreator = () => {
                     display: 'flex',
                     alignItems: 'left',
                     justifyContent: 'left',
-                    fontSize: `${122 * scale}px`,
+                    fontSize: `${105 * scale}px`,
+                    lineHeight: `${145 * scale}px`,
                     fontWeight: 'bold',
                     color: 'white',
                     position: 'relative',
                     zIndex: 10,
-                    left: `${16 * scale}px`,
+                    WebkitTextStroke: '1px white',
+                    left: `${18 * scale}px`,
                     marginRight: `${36 * scale}px`,
                     backgroundColor: cardColors[cardData.cardColor].bg,
                     ...helveticaFont
@@ -1243,12 +1245,13 @@ const CardCreator = () => {
                 height: `${195 * scale}px`,
                 backgroundColor: cardColors[cardData.cardColor].bg,
                 borderRadius: '50%',
+                WebkitTextStroke: '1px white',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: 'white',
                 fontWeight: 'bold',
-                fontSize: `${85 * scale}px`,
+                fontSize: `${80 * scale}px`,
                 ...helveticaFont,
                 zIndex: 1
               }}>
@@ -1293,7 +1296,7 @@ const CardCreator = () => {
                   backgroundColor: 'white',
                   border: `${5 * scale}px solid black`,
                   borderRadius: '40%',
-                  padding: `${2 * scale}px ${8 * scale}px`,
+                  padding: `${0 * scale}px ${8 * scale}px`,
                   display: 'flex',
                   alignItems: 'center',
                   lineHeight: '2px',
@@ -1306,7 +1309,7 @@ const CardCreator = () => {
                   <span style={{
                     color: 'transparent',
                     fontWeight: '900',
-                    lineHeight: '7px',
+                    lineHeight: '8px',
                     fontSize: `${25 * scale}px`,
                     WebkitTextStroke: '0.3px black',
                     position: 'absolute',
@@ -1318,7 +1321,7 @@ const CardCreator = () => {
                   <span style={{
                     color: 'black',
                     fontWeight: '900',
-                    lineHeight: '7px',
+                    lineHeight: '8px',
                     fontSize: `${25 * scale}px`,
                     position: 'relative',
                     zIndex: 2

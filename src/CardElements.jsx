@@ -211,6 +211,7 @@ const CardElements = ({
                     justifyContent: 'center',
                     fontWeight: 'bold',
                     borderRadius: currentMode.statsDiamonds.borderRadius,
+                    WebkitTextStroke: '1px white',
                     fontSize: `${95 * scale}px`,
                     ...helveticaFont
                   }}>
@@ -261,6 +262,7 @@ const CardElements = ({
                     justifyContent: 'center',
                     fontWeight: 'bold',
                     borderRadius: currentMode.statsDiamonds.borderRadius,
+                    WebkitTextStroke: '1px black',
                     fontSize: `${100 * scale}px`,
                     ...helveticaFont
                   }}>
