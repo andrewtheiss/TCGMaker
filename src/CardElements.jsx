@@ -86,7 +86,7 @@ const CardElements = ({
               backgroundColor: cardColors[cardData.cardColor].bg,
               color: 'white',
               lineHeight: currentMode.typeLine.height,
-              minWidth: '160px',
+              minWidth: '100px',
               margin: '0px -1px 0px -1px',
               borderRadius: currentMode.typeLine.borderRadius,
               ...helveticaFont

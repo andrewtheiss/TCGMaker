@@ -902,7 +902,7 @@ const CardCreator = () => {
                     left: `${18 * scale}px`,
                     marginRight: `${36 * scale}px`,
                     backgroundColor: cardColors[cardData.cardColor].bg,
-                    ...helveticaFont
+                    fontFamily: 'system-ui !important',
                   }}>
                  {cardData.leftIcon}
                </div>
@@ -1240,6 +1240,7 @@ const CardCreator = () => {
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
+                fontFamily: 'system-ui',
                 transform: 'translate(-50%, calc(-50% - 1px))',
                 width: `${195 * scale}px`,
                 height: `${195 * scale}px`,
@@ -1251,8 +1252,7 @@ const CardCreator = () => {
                 justifyContent: 'center',
                 color: 'white',
                 fontWeight: 'bold',
-                fontSize: `${80 * scale}px`,
-                ...helveticaFont,
+                fontSize: `${75 * scale}px`,
                 zIndex: 1
               }}>
                 {cardData.gatePower}
@@ -1498,17 +1498,17 @@ const CardCreator = () => {
               <div 
                 style={{
                   position: 'absolute',
-                  left: `${95 * scale}px`,
+                  left: `${90 * scale}px`,
                   top: `${1150 * scale}px`,
-                  width: `${128 * scale}px`,
-                  height: `${128 * scale}px`,
+                  width: `${132 * scale}px`,
+                  height: `${120 * scale}px`,
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'white',
                   fontWeight: 'normal',
-                  fontSize: `${100 * scale}px`,
+                  fontSize: `${120 * scale}px`,
                   zIndex: 1010,
                   backgroundColor: 'black',
                   paddingBottom: `${15 * scale}px`,
