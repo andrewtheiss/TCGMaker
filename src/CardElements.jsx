@@ -64,9 +64,9 @@ const CardElements = ({
       }}>
         <div style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}>
           {/* Left triangle edge using SVG */}
-          <svg width="12" height={currentMode.typeLine.height} style={{ marginLeft: '2px' }}>
+          <svg width="12" height="19">
             <polygon 
-              points={`-1,${parseFloat(currentMode.typeLine.height)/2} 11,-0.5 11,${currentMode.typeLine.height}`}
+              points="0,9.5 11,1 11,18"
               fill={cardColors[cardData.cardColor].bg}
             />
           </svg>
@@ -102,11 +102,9 @@ const CardElements = ({
           </CardElement>
           
           {/* Right triangle edge using SVG */}
-          <svg width="13" height={currentMode.typeLine.height}>
+          <svg width="12" height="19">
             <polygon 
-              points={`0,-0.5 12,${parseFloat(currentMode.typeLine.height)/2} -0.5,${currentMode.typeLine.height
-
-              }`}
+              points="0.999,1 1,18 12,9.5"
               fill={cardColors[cardData.cardColor].bg}
             />
           </svg>
@@ -176,38 +174,39 @@ const CardElements = ({
             {/* Power Box - Top */}
             <div style={{
               position: 'absolute',
-              top: '-19px',
-              left: 0,
+              top: '-21px',
+              left: -1.5,
               zIndex: 999
             }}>
               {/* Outer black border */}
               <div style={{
-                width: `${142 * scale}px`,
-                height: `${142 * scale}px`,
+                width: `${157 * scale}px`,
+                height: `${157 * scale}px`,
                 backgroundColor: 'black',
                 transform: currentMode.statsDiamonds.transform,
-                borderRadius: currentMode.statsDiamonds.borderRadius,
+                borderRadius: '6px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
                 {/* White border */}
                 <div style={{
-                  width: `${128 * scale}px`,
-                  height: `${128 * scale}px`,
+                  width: `${142 * scale}px`,
+                  height: `${142 * scale}px`,
                   backgroundColor: 'white',
-                  borderRadius: currentMode.statsDiamonds.borderRadius,
+                  borderRadius: '3px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}>
                   {/* Inner content */}
                   <div style={{
-                    width: `${116 * scale}px`,
-                    height: `${116 * scale}px`,
+                    width: `${133 * scale}px`,
+                    height: `${133 * scale}px`,
                     backgroundColor: currentMode.statsDiamonds.powerBg,
                     color: currentMode.statsDiamonds.powerColor,
                     display: 'flex',
+                    top: 5.5,
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: 'bold',
@@ -226,27 +225,27 @@ const CardElements = ({
             {/* Toughness Box - Bottom */}
             <div style={{
               position: 'absolute',
-              top: `${134 * scale}px`,
-              left: 0,
+              top: `${126 * scale}px`,
+              left: -1.5,
               zIndex: 999
             }}>
               {/* Outer black border */}
               <div style={{
-                width: `${142 * scale}px`,
-                height: `${142 * scale}px`,
+                width: `${157 * scale}px`,
+                height: `${157 * scale}px`,
                 backgroundColor: 'black',
                 transform: currentMode.statsDiamonds.transform,
-                borderRadius: currentMode.statsDiamonds.borderRadius,
+                borderRadius: '6px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
                 {/* White border */}
                 <div style={{
-                  width: `${128 * scale}px`,
-                  height: `${128 * scale}px`,
+                  width: `${142 * scale}px`,
+                  height: `${142 * scale}px`,
                   backgroundColor: 'white',
-                  borderRadius: currentMode.statsDiamonds.borderRadius,
+                  borderRadius: '4px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
