@@ -5,55 +5,53 @@ export const textFormattingConfig = {
   // Special keyword tokens with custom styling
   keywords: {
     '%onceaturn%': {
-      displayText: 'ONCE A TURN',
-      backgroundColor: '#ff6b6b',
+      displayText: 'Once / Turn',
+      backgroundColor: '#f2419a',
       color: 'white',
       borderRadius: '12px',
-      padding: '2px 8px',
+      padding: '0 8px',
       fontSize: '0.9em',
       fontWeight: 'bold',
-      textTransform: 'uppercase'
+      textShadow: 'none'
     },
     '%whenattacking%': {
-      displayText: 'WHEN ATTACKING',
-      backgroundColor: '#ffd93d',
-      color: '#333',
-      borderRadius: '12px',
-      padding: '2px 8px',
+      displayText: 'Attacker',
+      backgroundColor: '#d61f35',
+      color: 'white',
+      borderRadius: '0',
+      padding: '0 8px 0 5px',
       fontSize: '0.9em',
       fontWeight: 'bold',
-      textTransform: 'uppercase'
+      textShadow: 'none',
+      clipPath: 'polygon(0% 0%, calc(100% - 6px) 0%, 100% 50%, calc(100% - 6px) 100%, 0% 100%)'
     },
     '%tap%': {
-      displayText: '⟲',
-      backgroundColor: '#95a5a6',
-      color: 'white',
-      borderRadius: '50%',
-      padding: '4px 6px',
-      fontSize: '1.1em',
+      displayText: ':',
+      isImage: true,
+      imageSrc: '/src/assets/tap.png',
       fontWeight: 'bold',
-      minWidth: '20px',
-      textAlign: 'center'
+      textShadow: 'none'
     },
     '%defender%': {
-      displayText: 'DEFENDER',
-      backgroundColor: '#3498db',
+      displayText: 'Defender',
+      backgroundColor: '#faa43c',
       color: 'white',
-      borderRadius: '12px',
-      padding: '2px 8px',
+      borderRadius: '0',
+      padding: '0 8px',
       fontSize: '0.9em',
       fontWeight: 'bold',
-      textTransform: 'uppercase'
+      textShadow: 'none',
+      clipPath: 'polygon(6px 0%, calc(100% - 6px) 0%, 100% 50%, calc(100% - 6px) 100%, 6px 100%, 0% 50%)'
     },
     '%onplay%': {
-      displayText: 'ON PLAY',
-      backgroundColor: '#4285f4',
+      displayText: 'On Play',
+      backgroundColor: '#3d5daa',
       color: 'white',
-      borderRadius: '16px',
-      padding: '3px 10px',
+      borderRadius: '12px',
+      padding: '0 10px',
       fontSize: '0.9em',
       fontWeight: 'bold',
-      textTransform: 'uppercase'
+      textShadow: 'none'
     }
   },
   
@@ -69,8 +67,22 @@ export const textFormattingConfig = {
       pattern: /\$(.*?)\$/g,
       style: {
         fontStyle: 'italic',
-        textDecoration: 'underline',
         opacity: 0.8
+      }
+    },
+    cost: {
+      pattern: /\^(.*?)\^/g,
+      style: {
+        backgroundColor: '#000000',
+        color: 'white',
+        borderRadius: '50%',
+        padding: '0 6px',
+        fontSize: '0.9em',
+        fontWeight: 'bold',
+        textShadow: 'none',
+        minWidth: '20px',
+        textAlign: 'center',
+        display: 'inline-block'
       }
     }
   }

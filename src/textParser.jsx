@@ -12,14 +12,39 @@ export const parseFormattedText = (text, baseStyle = {}) => {
     // Check if this part is a keyword token
     const keywordConfig = textFormattingConfig.keywords[part.toLowerCase()];
     if (keywordConfig) {
+      // Special handling for tap image
+      if (keywordConfig.isImage) {
+        return (
+          <span key={index} style={{ display: 'inline-block', margin: '0 2px' }}>
+            <img 
+              src={keywordConfig.imageSrc} 
+              alt="tap" 
+              style={{ 
+                height: baseStyle.fontSize || '1em',
+                verticalAlign: 'middle',
+                margin: '0 2px'
+              }} 
+            />
+            <span style={{ 
+              fontWeight: keywordConfig.fontWeight,
+              textShadow: keywordConfig.textShadow,
+              ...baseStyle
+            }}>
+              {keywordConfig.displayText}
+            </span>
+          </span>
+        );
+      }
+      
       return (
         <span
           key={index}
           style={{
             display: 'inline-block',
-            margin: '0 2px',
+            margin: keywordConfig.margin || '0 2px',
             ...keywordConfig,
             fontSize: `calc(${baseStyle.fontSize || '1em'} * ${keywordConfig.fontSize || '1'})`,
+            textShadow: keywordConfig.textShadow || 'none'
           }}
         >
           {keywordConfig.displayText}
@@ -46,11 +71,35 @@ export const parseFormattedText = (text, baseStyle = {}) => {
           style={{
             ...baseStyle,
             fontStyle: 'italic',
-            textDecoration: 'underline',
             opacity: 0.8
           }}
         >
           {italicMatch[1]}
+        </span>
+      );
+    }
+
+    // Check for cost formatting: ^text^
+    const costMatch = part.match(/^\^(.*)\^$/);
+    if (costMatch) {
+      return (
+        <span
+          key={index}
+          style={{
+            backgroundColor: '#000000',
+            color: 'white',
+            borderRadius: '50%',
+            padding: '0 0px',
+            fontSize: `calc(${baseStyle.fontSize || '1em'} * 0.9)`,
+            fontWeight: 'bold',
+            textShadow: 'none',
+            minWidth: '20px',
+            textAlign: 'center',
+            display: 'inline-block',
+            margin: '0 2px'
+          }}
+        >
+          {costMatch[1]}
         </span>
       );
     }
@@ -70,9 +119,10 @@ const splitTextWithTokens = (text) => {
   const keywordPattern = Object.keys(textFormattingConfig.keywords).join('|');
   const boldPattern = '\\*[^*]+\\*';
   const italicPattern = '\\$[^$]+\\$';
+  const costPattern = '\\^[^^]+\\^';
   
   const combinedPattern = new RegExp(
-    `(${keywordPattern}|${italicPattern}|${boldPattern})`,
+    `(${keywordPattern}|${italicPattern}|${boldPattern}|${costPattern})`,
     'gi'
   );
 
@@ -103,6 +153,12 @@ export const validateFormatting = (text) => {
   const dollarSigns = (text.match(/\$/g) || []).length;
   if (dollarSigns % 2 !== 0) {
     errors.push('Unmatched dollar sign for italic formatting');
+  }
+  
+  // Check for unmatched carets (cost)
+  const carets = (text.match(/\^/g) || []).length;
+  if (carets % 2 !== 0) {
+    errors.push('Unmatched caret for cost formatting');
   }
   
   return errors;

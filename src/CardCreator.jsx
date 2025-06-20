@@ -421,18 +421,17 @@ const CardCreator = () => {
                     updateCardData('textBox', textBefore + '%onceaturn%' + textAfter);
                   }}
                   style={{
-                    backgroundColor: '#ff6b6b',
+                    backgroundColor: '#f2419a',
                     color: 'white',
                     borderRadius: '6px',
-                    padding: '2px 6px',
+                    padding: '0 6px',
                     fontSize: '8px',
                     fontWeight: 'bold',
-                    textTransform: 'uppercase',
                     border: 'none',
                     cursor: 'pointer'
                   }}
                 >
-                  ONCE A TURN
+                  Once / Turn
                 </button>
                 
                 <button
@@ -444,18 +443,18 @@ const CardCreator = () => {
                     updateCardData('textBox', textBefore + '%whenattacking%' + textAfter);
                   }}
                   style={{
-                    backgroundColor: '#ffd93d',
-                    color: '#333',
-                    borderRadius: '6px',
-                    padding: '2px 6px',
+                    backgroundColor: '#d61f35',
+                    color: 'white',
+                    borderRadius: '0',
+                    padding: '0 8px 0 6px',
                     fontSize: '8px',
                     fontWeight: 'bold',
-                    textTransform: 'uppercase',
                     border: 'none',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    clipPath: 'polygon(4px 0%, 100% 0%, 100% 100%, 4px 100%, 0% 50%)'
                   }}
                 >
-                  WHEN ATTACKING
+                  Attacker
                 </button>
                 
                 <button
@@ -467,19 +466,20 @@ const CardCreator = () => {
                     updateCardData('textBox', textBefore + '%tap%' + textAfter);
                   }}
                   style={{
-                    backgroundColor: '#95a5a6',
-                    color: 'white',
-                    borderRadius: '50%',
-                    padding: '2px 4px',
-                    fontSize: '10px',
+                    backgroundColor: '#f8f9fa',
+                    color: '#333',
+                    borderRadius: '4px',
+                    padding: '0 6px',
+                    fontSize: '8px',
                     fontWeight: 'bold',
-                    minWidth: '16px',
-                    textAlign: 'center',
-                    border: 'none',
-                    cursor: 'pointer'
+                    border: '1px solid #dee2e6',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '2px'
                   }}
                 >
-                  ⟲
+                  <img src="/tap.png" alt="tap" style={{ height: '10px', verticalAlign: 'middle' }} /> :
                 </button>
                 
                 <button
@@ -491,18 +491,18 @@ const CardCreator = () => {
                     updateCardData('textBox', textBefore + '%defender%' + textAfter);
                   }}
                   style={{
-                    backgroundColor: '#3498db',
+                    backgroundColor: '#faa43c',
                     color: 'white',
-                    borderRadius: '6px',
-                    padding: '2px 6px',
+                    borderRadius: '0',
+                    padding: '0 8px',
                     fontSize: '8px',
                     fontWeight: 'bold',
-                    textTransform: 'uppercase',
                     border: 'none',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    clipPath: 'polygon(4px 0%, calc(100% - 4px) 0%, 100% 50%, calc(100% - 4px) 100%, 4px 100%, 0% 50%)'
                   }}
                 >
-                  DEFENDER
+                  Defender
                 </button>
                 
                 <button
@@ -514,18 +514,17 @@ const CardCreator = () => {
                     updateCardData('textBox', textBefore + '%onplay%' + textAfter);
                   }}
                   style={{
-                    backgroundColor: '#4285f4',
+                    backgroundColor: '#3d5daa',
                     color: 'white',
-                    borderRadius: '8px',
-                    padding: '2px 6px',
+                    borderRadius: '6px',
+                    padding: '0 6px',
                     fontSize: '8px',
                     fontWeight: 'bold',
-                    textTransform: 'uppercase',
                     border: 'none',
                     cursor: 'pointer'
                   }}
                 >
-                  ON PLAY
+                  On Play
                 </button>
               </div>
               
@@ -556,28 +555,62 @@ const CardCreator = () => {
                   *Bold*
                 </button>
                 
-                <button
-                  onClick={() => {
-                    const textarea = document.querySelector('textarea');
-                    const cursorPos = textarea.selectionStart;
-                    const textBefore = cardData.textBox.substring(0, cursorPos);
-                    const textAfter = cardData.textBox.substring(cursorPos);
-                    updateCardData('textBox', textBefore + '$text$' + textAfter);
-                  }}
-                  style={{
-                    ...inputStyle,
-                    height: 'auto',
-                    padding: '4px 8px',
-                    fontSize: '10px',
-                    fontStyle: 'italic',
-                    textDecoration: 'underline',
-                    backgroundColor: '#f8f9fa',
-                    border: '1px solid #dee2e6',
-                    marginBottom: '0'
-                  }}
-                >
-                  $Italic$
-                </button>
+                                 <button
+                   onClick={() => {
+                     const textarea = document.querySelector('textarea');
+                     const cursorPos = textarea.selectionStart;
+                     const textBefore = cardData.textBox.substring(0, cursorPos);
+                     const textAfter = cardData.textBox.substring(cursorPos);
+                     updateCardData('textBox', textBefore + '$text$' + textAfter);
+                   }}
+                   style={{
+                     ...inputStyle,
+                     height: 'auto',
+                     padding: '4px 8px',
+                     fontSize: '10px',
+                     fontStyle: 'italic',
+                     backgroundColor: '#f8f9fa',
+                     border: '1px solid #dee2e6',
+                     marginBottom: '0'
+                   }}
+                 >
+                   $Italic$
+                 </button>
+                 
+                 <button
+                   onClick={() => {
+                     const textarea = document.querySelector('textarea');
+                     const cursorPos = textarea.selectionStart;
+                     const textBefore = cardData.textBox.substring(0, cursorPos);
+                     const textAfter = cardData.textBox.substring(cursorPos);
+                     updateCardData('textBox', textBefore + '^1^' + textAfter);
+                   }}
+                   style={{
+                     ...inputStyle,
+                     height: 'auto',
+                     padding: '4px 8px',
+                     fontSize: '10px',
+                     backgroundColor: '#f8f9fa',
+                     border: '1px solid #dee2e6',
+                     marginBottom: '0',
+                     display: 'flex',
+                     alignItems: 'center',
+                     gap: '4px'
+                   }}
+                 >
+                   <span style={{
+                     backgroundColor: '#000000',
+                     color: 'white',
+                     borderRadius: '50%',
+                     padding: '0 4px',
+                     fontSize: '8px',
+                     fontWeight: 'bold',
+                     minWidth: '14px',
+                     textAlign: 'center',
+                     display: 'inline-block'
+                   }}>1</span>
+                   Cost
+                 </button>
               </div>
             </div>
 
@@ -587,7 +620,10 @@ const CardCreator = () => {
               style={{ ...inputStyle, height: '120px', resize: 'vertical', fontFamily: 'monospace', fontSize: '11px' }}
               placeholder="Type here or use buttons above to insert formatting...
 
-Example: %onplay% *Summon* a 2/2 $defender$ token."
+Examples: 
+• %onplay% *Summon* a 2/2 $defender$ token.
+• Pay ^2^ to activate this ability.
+• *Bold*, $Italic$, ^Cost^ formatting"
             />
             <div style={{ fontSize: '11px', color: '#888', marginTop: '4px' }}>
               ✨ Live preview on card! Changes appear instantly with formatted styling.
