@@ -125,26 +125,38 @@ const CardElements = ({
       }} />
 
       {/* Card Ability Text - positioned absolutely to card */}
-      <CardElement elementType="textBox">
+      <CardElement elementType="abilityText">
         <div style={{
           position: 'absolute',
-          left: cardData.fullArt ? `${104 * scale}px` : `${152 * scale}px`,
-          right: cardData.type === 'creature' || cardData.type === 'equipment' ? `${288 * scale}px` : `${104 * scale}px`,
-          top: `${1164 * scale}px`,
-          bottom: `${464 * scale}px`,
+          left: cardData.fullArt ? `${85 * scale}px` : `${85 * scale}px`,
+          right: cardData.type === 'creature' || cardData.type === 'equipment' ? `${85 * scale}px` : `${85 * scale}px`,
+          top: `${1326 * scale}px`,
+          bottom: `${180 * scale}px`,
           backgroundColor: currentMode.textBox.backgroundColor,
           borderRadius: currentMode.textBox.borderRadius,
           padding: currentMode.textBox.padding,
+          textAlign: 'justify',
           zIndex: 1005,
           pointerEvents: 'auto',
-                     border: 'none'
+          border: '0px solid black'
         }}>
           <p style={{
-            fontSize: `${56 * scale}px`,
-            margin: 0,
+            fontSize: `${50 * scale}px`,
+            lineHeight: `${70 * scale}px`,
+            margin: '-5px -3px',
                          color: 'black',
-             fontWeight: '500',
-             ...(cardData.fullArt ? { ...helveticaFont, ...textShadowStyle } : helveticaFont)
+             fontWeight: '600',
+             textShadow: cardData.fullArt ? `
+               -1px -1px 0 white,
+               1px -1px 0 white,
+               -1px 1px 0 white,
+               1px 1px 0 white,
+               0 1px 0 white,
+               1px 0 0 white,
+               0 -1px 0 white,
+               -1px 0 0 white
+             ` : 'none',
+             ...helveticaFont
           }}>
             {cardData.textBox}
           </p>
@@ -158,7 +170,7 @@ const CardElements = ({
             position: 'absolute',
             right: `${210 * scale}px`,
             bottom: `${474 * scale}px`,
-            zIndex: 1003
+            zIndex: 1012
           }}>
             {/* Power Box - Top */}
             <div style={{
@@ -222,7 +234,7 @@ const CardElements = ({
             position: 'absolute',
             right: `${100 * scale}px`,
             bottom: `${180 * scale}px`,
-            zIndex: 1003
+            zIndex: 1012
           }}>
             <div style={{
               width: `${128 * scale}px`,

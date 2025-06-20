@@ -4,6 +4,10 @@ import beanImage from './assets/bean.png';
 import cardogImage from './assets/jade.png';
 import gatePowerImage from './assets/gatepower.png';
 import izkWhiteImage from './assets/ikz_white.png';
+import waterImage from './assets/domain/water.png';
+import earthImage from './assets/domain/earth.png';
+import smokeImage from './assets/domain/smoke.png';
+import lightningImage from './assets/domain/lightning.png';
 import CardElements from './CardElements';
 
 const CardCreator = () => {
@@ -22,7 +26,7 @@ const CardCreator = () => {
     rarity: 'rare',
     leftIcon: '1',
     rightIcon: '⚔️',
-    rightIconColor: 'water',
+    rightIconDomain: 'water',
     setCode: 'Elemental',
     cardNumber: '10002',
     overlayImage: cardogImage,
@@ -32,7 +36,11 @@ const CardCreator = () => {
     footerCenter: 'BBB',
     footerRarity: 'U',
     copyrightText: 'Your Name Here',
-    elementMode: 'classic'
+    elementMode: 'classic',
+    circularText: 'ELEMENTAL POWER',
+    showLeftIcons: true,
+    textRotation: 55,
+    flipCircularText: true
   });
 
   const [selectedElement, setSelectedElement] = useState(null);
@@ -47,6 +55,39 @@ const CardCreator = () => {
   const cardWidth = 1500;
   const cardHeight = 2100;
   const scale = 0.25; // Scale down for display (375px x 525px)
+
+  // Helper function to convert hex color to hue for CSS filter
+  const hexToHue = (hex) => {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0;
+    
+    if (max !== min) {
+      const delta = max - min;
+      switch (max) {
+        case r: h = ((g - b) / delta + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / delta + 2) / 6; break;
+        case b: h = ((r - g) / delta + 4) / 6; break;
+      }
+    }
+    
+    return Math.round(h * 360);
+  };
+
+  // Helper function to get domain image
+  const getDomainImage = (domain) => {
+    switch (domain) {
+      case 'water': return waterImage;
+      case 'earth': return earthImage;
+      case 'smoke': return smokeImage;
+      case 'lightning': return lightningImage;
+      default: return waterImage;
+    }
+  };
 
   const domainColors = {
     earth: { primary: '#8B4513', secondary: '#D2691E', symbol: '🗿' },
@@ -142,7 +183,7 @@ const CardCreator = () => {
 
     const panelStyle = {
       position: 'absolute',
-      top: '16px',
+      top: '50px',
       right: '16px',
       backgroundColor: 'white',
       borderRadius: '8px',
@@ -175,7 +216,7 @@ const CardCreator = () => {
       <div style={panelStyle}>
         <h3 style={{ fontWeight: 'bold', marginBottom: '12px' }}>Edit {selectedElement}</h3>
         
-        {selectedElement === 'name' && (
+        {selectedElement === 'cardName' && (
           <input
             type="text"
             value={cardData.name}
@@ -185,46 +226,7 @@ const CardCreator = () => {
           />
         )}
         
-        {selectedElement === 'cardColor' && (
-          <div>
-            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
-              Card Color
-            </label>
-            {Object.entries(cardColors).map(([colorKey, colorConfig]) => (
-              <button
-                key={colorKey}
-                onClick={() => updateCardData('cardColor', colorKey)}
-                style={{
-                  ...inputStyle,
-                  backgroundColor: cardData.cardColor === colorKey ? '#e5e7eb' : '#f9fafb',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                  marginBottom: '4px'
-                }}
-              >
-                <span style={{ textTransform: 'capitalize' }}>{colorKey}</span>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <div style={{
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '50%',
-                    backgroundColor: colorConfig.bg,
-                    border: '1px solid #ccc'
-                  }} />
-                  <div style={{
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '50%',
-                    backgroundColor: colorConfig.fg,
-                    border: '1px solid #ccc'
-                  }} />
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
+
         
         {selectedElement === 'leftIcon' && (
           <input
@@ -238,25 +240,61 @@ const CardCreator = () => {
         
         {selectedElement === 'rightIcon' && (
           <div>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Element Power Text
+            </label>
             <input
               type="text"
-              value={cardData.rightIcon}
-              onChange={(e) => updateCardData('rightIcon', e.target.value)}
+              value={cardData.circularText}
+              onChange={(e) => updateCardData('circularText', e.target.value)}
               style={inputStyle}
-              placeholder="Right Icon"
+              placeholder="Element Power Text"
             />
-            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px' }}>
-              Icon Color (affects all header icons)
+            
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px', marginTop: '12px' }}>
+              <input
+                type="checkbox"
+                checked={cardData.flipCircularText}
+                onChange={(e) => updateCardData('flipCircularText', e.target.checked)}
+                style={{ marginRight: '8px' }}
+              />
+              Flip Text Direction
+            </label>
+            <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>
+              Check this if text appears backwards on the bottom portion
+            </div>
+            
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px', marginTop: '12px' }}>
+              Domain Element
             </label>
             <select
-              value={cardData.rightIconColor}
-              onChange={(e) => updateCardData('rightIconColor', e.target.value)}
+              value={cardData.rightIconDomain}
+              onChange={(e) => updateCardData('rightIconDomain', e.target.value)}
               style={inputStyle}
             >
-              {Object.keys(domainColors).map(domain => (
-                <option key={domain} value={domain}>{domain}</option>
-              ))}
+              <option value="water">Water</option>
+              <option value="earth">Earth</option>
+              <option value="smoke">Smoke</option>
+              <option value="lightning">Lightning</option>
             </select>
+
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px', marginTop: '12px' }}>
+              Text Rotation: {cardData.textRotation}%
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={cardData.textRotation}
+              onChange={(e) => updateCardData('textRotation', parseFloat(e.target.value))}
+              style={{
+                ...inputStyle,
+                cursor: 'pointer'
+              }}
+            />
+            <div style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
+              Adjust the position of text around the icon (0% = top, 25% = right, 50% = bottom, 75% = left)
+            </div>
           </div>
         )}
         
@@ -349,7 +387,7 @@ const CardCreator = () => {
           </div>
         )}
         
-        {selectedElement === 'textBox' && (
+        {selectedElement === 'abilityText' && (
           <textarea
             value={cardData.textBox}
             onChange={(e) => updateCardData('textBox', e.target.value)}
@@ -534,6 +572,69 @@ const CardCreator = () => {
             </p>
           </div>
         )}
+
+        {selectedElement === 'circularText' && (
+          <input
+            type="text"
+            value={cardData.circularText}
+            onChange={(e) => updateCardData('circularText', e.target.value)}
+            style={inputStyle}
+            placeholder="Circular Text around Icon"
+          />
+        )}
+
+        {selectedElement === 'cardColor' && (
+          <div>
+            <button
+              onClick={() => updateCardData('showLeftIcons', !cardData.showLeftIcons)}
+              style={{
+                ...inputStyle,
+                backgroundColor: cardData.showLeftIcons ? '#10b981' : '#e5e7eb',
+                color: cardData.showLeftIcons ? 'white' : 'black',
+                cursor: 'pointer',
+                marginBottom: '8px'
+              }}
+            >
+              Show Left Icons: {cardData.showLeftIcons ? 'ON' : 'OFF'}
+            </button>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Card Color
+            </label>
+            {Object.entries(cardColors).map(([colorKey, colorConfig]) => (
+              <button
+                key={colorKey}
+                onClick={() => updateCardData('cardColor', colorKey)}
+                style={{
+                  ...inputStyle,
+                  backgroundColor: cardData.cardColor === colorKey ? '#e5e7eb' : '#f9fafb',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  marginBottom: '4px'
+                }}
+              >
+                <span style={{ textTransform: 'capitalize' }}>{colorKey}</span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    backgroundColor: colorConfig.bg,
+                    border: '1px solid #ccc'
+                  }} />
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    backgroundColor: colorConfig.fg,
+                    border: '1px solid #ccc'
+                  }} />
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
         
         <button onClick={() => setSelectedElement(null)} style={buttonStyle}>
           Close
@@ -639,115 +740,331 @@ const CardCreator = () => {
           
 
           
-                                {/* Header - Absolutely positioned */}
+          {/* Card Name Background Container - Absolutely positioned */}
+          <div 
+            className="card-name-background"
+            style={{
+              position: 'absolute',
+              top: `${47 * scale}px`,
+              left: 0,
+              right: cardData.fullArt ? 0 : `${0 * scale}px`,
+              height: `${128 * scale}px`,
+              backgroundColor: cardData.fullArt ? 'transparent' : 'black',
+              borderRadius: cardData.fullArt ? '0' : `${48 * scale}px ${48 * scale}px 0 0`,
+              zIndex: 14,
+              pointerEvents: 'none'
+            }}
+          />
+
+          {/* Header - Absolutely positioned */}
           <div className="card-header-container" style={{
             position: 'absolute',
-            top: `${47 * scale}px`,
-            left: `${104 * scale}px`,
-            right: `${104 * scale}px`,
+            top: `${50 * scale}px`,
+            left: cardData.fullArt ? `${38 * scale}px` : `${38 * scale}px`,
+            right: cardData.fullArt ? `${36 * scale}px` : `${36 * scale}px`,
             height: `${128 * scale}px`,
-            backgroundColor: cardData.fullArt ? 'transparent' : 'black',
+            backgroundColor: 'transparent',
             color: 'white',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             gap: `${32 * scale}px`,
-            zIndex: 15,
-            borderRadius: cardData.fullArt ? '0' : `${48 * scale}px ${48 * scale}px 0 0`
+            zIndex: 15
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: `${16 * scale}px`, position: 'relative' }}>
-              {/* Connecting background when both are present */}
-              {cardData.cardColor && cardData.leftIcon && (
-                <div style={{
+            {/* Hidden icons mouseover area - positioned outside the hidden container */}
+            {!cardData.showLeftIcons && (
+              <div 
+                style={{
                   position: 'absolute',
-                  borderRadius: `${80 * scale}px`,
-                  backgroundColor: cardColors[cardData.cardColor].fg,
-                  left: `${-16 * scale}px`,
-                  right: `${-16 * scale}px`,
+                  left: cardData.fullArt ? `${38 * scale}px` : `${38 * scale}px`,
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  height: `${160 * scale}px`
+                  width: `${300 * scale}px`,
+                  height: `${149 * scale}px`,
+                  cursor: 'pointer',
+                  zIndex: 20
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.outline = '3px dashed rgba(255,255,255,0.7)';
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.outline = 'none';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+                onClick={() => updateCardData('showLeftIcons', true)}
+                title="Click to show left icons"
+              />
+            )}
+
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: `${16 * scale}px`, 
+              position: 'relative',
+              paddingLeft: cardData.fullArt ? `${0 * scale}px` : `${0 * scale}px`,
+              opacity: cardData.showLeftIcons ? 1 : 0,
+              visibility: cardData.showLeftIcons ? 'visible' : 'hidden'
+            }}>
+              {/* Connecting background when both are present */}
+              {cardData.cardColor && cardData.leftIcon && cardData.showLeftIcons && (
+                <div style={{
+                  border: '4px solid black',
+                  position: 'absolute',
+                  borderRadius: `${90 * scale}px`,
+                  backgroundColor: cardColors[cardData.cardColor].bg,
+                  left: `${-16 * scale}px`,
+                  right: `${0 * scale}px`,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  height: `${148 * scale}px`
                 }} />
               )}
            
               {/* Card Color bubble */}
-              <CardElement elementType="cardColor">
-                <div style={{
-                  width: `${160 * scale}px`,
-                  height: `${160 * scale}px`,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  zIndex: 10,
-                  backgroundColor: cardColors[cardData.cardColor].bg,
-                  border: `${8 * scale}px solid white`,
-                  overflow: 'hidden'
-                }}>
-               <img 
-                 src={izkWhiteImage}
-                 alt="IZK"
-                 style={{
-                   width: '80%',
-                   height: '80%',
-                   objectFit: 'contain'
-                 }}
-               />
-             </div>
-           </CardElement>
-           
-              {/* Left Icon */}
-              {cardData.leftIcon && (
-                <CardElement elementType="leftIcon">
+              {cardData.showLeftIcons && (
+                <CardElement elementType="cardColor">
                   <div style={{
-                    width: `${160 * scale}px`,
-                    height: `${160 * scale}px`,
+                    width: `${149 * scale}px`,
+                    height: `${149 * scale}px`,
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: `${56 * scale}px`,
+                    position: 'relative',
+                    zIndex: 10,
+                    backgroundColor: cardColors[cardData.cardColor].bg,
+                    border: `${0 * scale}px solid white`,
+                    overflow: 'hidden'
+                  }}>
+                 <img 
+                   src={izkWhiteImage}
+                   alt="IZK"
+                   style={{
+                     width: '92%',
+                     height: '92%',
+                     objectFit: 'contain',
+                     filter: `sepia(1) hue-rotate(${hexToHue(cardColors[cardData.cardColor].fg) - 115}deg) saturate(13.1)`
+                   }}
+                 />
+               </div>
+             </CardElement>
+              )}
+           
+              {/* Left Icon */}
+              {cardData.leftIcon && cardData.showLeftIcons && (
+                <CardElement elementType="leftIcon">
+                  <div style={{
+                    width: `${120 * scale}px`,
+                    height: `${140 * scale}px`,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'left',
+                    justifyContent: 'left',
+                    fontSize: `${122 * scale}px`,
                     fontWeight: 'bold',
                     color: 'white',
                     position: 'relative',
                     zIndex: 10,
+                    left: `${16 * scale}px`,
+                    marginRight: `${36 * scale}px`,
                     backgroundColor: cardColors[cardData.cardColor].bg,
-                    border: `${8 * scale}px solid white`,
                     ...helveticaFont
                   }}>
                  {cardData.leftIcon}
                </div>
              </CardElement>
-           )}
+              )}
          </div>
          
             {/* Card Name */}
-            <CardElement elementType="name" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: `${80 * scale}px`, minWidth: `${cardWidth * 0.4 * scale}px` }}>
-              <h2 style={{ fontSize: `${92 * scale}px`, fontWeight: 'bold', margin: 0, lineHeight: `${80 * scale}px`, textAlign: 'center', ...helveticaFont }}>
+            <CardElement elementType="cardName" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', height: `${80 * scale}px`, minWidth: `${cardWidth * 0.4 * scale}px`, position: 'relative' }}>
+              {/* First render: Stroke outline */}
+              <h2 style={{ 
+                fontSize: `${92 * scale}px`, 
+                fontWeight: 'bold', 
+                margin: 0, 
+                lineHeight: `${80 * scale}px`, 
+                paddingLeft: cardData.showLeftIcons ? `${10 * scale}px` : `${50 * scale}px`,
+                WebkitTextStroke: cardData.fullArt ? '3px black' : 'none',
+                color: cardData.fullArt ? 'transparent' : 'white',
+                textShadow: cardData.fullArt ? 'none' : `
+                  -3px -3px 0 black,
+                  3px -3px 0 black,
+                  -3px 3px 0 black,
+                  3px 3px 0 black,
+                  0 3px 0 black,
+                  3px 0 0 black,
+                  0 -3px 0 black,
+                  -3px 0 0 black
+                `,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                zIndex: 1,
+                ...helveticaFont 
+              }}>
+                {cardData.name}
+              </h2>
+              
+              {/* Second render: Clean text overlay */}
+              <h2 style={{ 
+                fontSize: `${92 * scale}px`, 
+                fontWeight: 'bold', 
+                margin: 0, 
+                lineHeight: `${80 * scale}px`, 
+                paddingLeft: cardData.showLeftIcons ? `${10 * scale}px` : `${50 * scale}px`,
+                color: 'white',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                zIndex: 2,
+                ...helveticaFont 
+              }}>
                 {cardData.name}
               </h2>
             </CardElement>
          
-            {/* Right Icon */}
-            <CardElement elementType="rightIcon">
-              <div style={{
-                width: `${160 * scale}px`,
-                height: `${160 * scale}px`,
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: `${56 * scale}px`,
-                fontWeight: 'bold',
-                color: 'white',
-                backgroundColor: cardColors[cardData.cardColor].bg,
-                border: `${8 * scale}px solid white`,
-                ...helveticaFont
-              }}>
-             {cardData.rightIcon}
-           </div>
-         </CardElement>
+            {/* RIGHT ICON AREA - Top Right Corner Domain Element */}
+            <CardElement elementType="rightIcon" style={{ paddingRight: cardData.fullArt ? `${104 * scale}px` : 0, position: 'relative' }}>
+              {/* OUTERMOST CONTAINER - Main positioning container (220x220px) */}
+              <div 
+                className="right-icon-outer-container"
+                style={{
+                  width: `${220 * scale}px`,
+                  height: `${220 * scale}px`,
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                
+                                  {/* CIRCULAR TEXT AREA - Text that curves around the outer perimeter */}
+                  <CardElement elementType="circularText" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+                    {/* CIRCULAR TEXT STROKE - First render with black stroke outline */}
+                    <svg 
+                      className="circular-text-stroke-svg"
+                      width={`${220 * scale}px`} 
+                      height={`${220 * scale}px`} 
+                      style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }}
+                    >
+                      <defs>
+                                              <path 
+                        id="circle-path-stroke" 
+                        d={cardData.flipCircularText 
+                          ? `M ${109.99 * scale} ${15 * scale} A ${95 * scale} ${95 * scale} 0 1 0 ${110 * scale} ${15 * scale}`
+                          : `M ${110 * scale} ${25 * scale} A ${85 * scale} ${85 * scale} 0 1 1 ${109.99 * scale} ${25 * scale}`
+                        }
+                      />
+                      </defs>
+                      <text 
+                        className="circular-text-stroke"
+                        fontSize={`${28 * scale}px`} 
+                        fill="transparent"
+                        fontWeight="900"
+                        stroke="black"
+                        strokeWidth={`${12 * scale}px`}
+                        strokeLinejoin="round"
+                        strokeLinecap="round"
+                        style={{ 
+                          ...helveticaFont,
+                          fontWeight: '900',
+                          letterSpacing: `${3.5 * scale}px`
+                        }}
+                      >
+                        <textPath href="#circle-path-stroke" startOffset={`${cardData.textRotation}%`}>
+                          {cardData.circularText || 'GATE'}
+                        </textPath>
+                      </text>
+                    </svg>
+                    
+                    {/* CIRCULAR TEXT FILL - Second render with clean white text overlay */}
+                    <svg 
+                      className="circular-text-fill-svg"
+                      width={`${220 * scale}px`} 
+                      height={`${220 * scale}px`} 
+                      style={{ position: 'absolute', top: 0, left: 0, zIndex: 2 }}
+                    >
+                      <defs>
+                                              <path 
+                        id="circle-path-fill" 
+                        d={cardData.flipCircularText 
+                          ? `M ${109.99 * scale} ${15 * scale} A ${95 * scale} ${95 * scale} 0 1 0 ${110 * scale} ${15 * scale}`
+                          : `M ${110 * scale} ${25 * scale} A ${85 * scale} ${85 * scale} 0 1 1 ${109.99 * scale} ${25 * scale}`
+                        }
+                      />
+                      </defs>
+                      <text 
+                        className="circular-text-fill"
+                        fontSize={`${28 * scale}px`} 
+                        fill="white"
+                        fontWeight="900"
+                        stroke="none"
+                        style={{ 
+                          ...helveticaFont,
+                          fontWeight: '900',
+                          letterSpacing: `${3.5 * scale}px`
+                        }}
+                      >
+                        <textPath href="#circle-path-fill" startOffset={`${cardData.textRotation}%`}>
+                          {cardData.circularText || 'GATE'}
+                        </textPath>
+                      </text>
+                    </svg>
+                  </CardElement>
+
+                {/* WHITE BORDER RING - Middle ring with white border (200x200px) */}
+                <div 
+                  className="white-border-ring"
+                  style={{
+                    width: `${200 * scale}px`,
+                    height: `${200 * scale}px`,
+                    borderRadius: '50%',
+                    border: `${1 * scale}px solid white`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    backgroundColor: 'transparent'
+                  }}
+                >
+                  {/* DOMAIN ICON CONTAINER - Inner circle with domain image (120x120px) */}
+                  <div 
+                    className="domain-icon-container"
+                    style={{
+                      width: `${120 * scale}px`,
+                      height: `${120 * scale}px`,
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: `${56 * scale}px`,
+                      fontWeight: 'bold',
+                      color: 'white',
+                      backgroundColor: cardColors[cardData.cardColor].bg,
+                      border: `${18 * scale}px solid ` + cardColors[cardData.cardColor].bg,
+                      ...helveticaFont
+                    }}
+                  >
+                    {/* DOMAIN IMAGE - Water/Earth/Smoke/Lightning element image */}
+                    <img 
+                      className="domain-image"
+                      src={getDomainImage(cardData.rightIconDomain)}
+                      alt={`${cardData.rightIconDomain} Domain`}
+                      style={{
+                        width: '160%',
+                        height: '160%',
+                        objectFit: 'contain',
+                        filter: `sepia(1) hue-rotate(${hexToHue(cardColors[cardData.cardColor].fg) - 115}deg) saturate(13.1)`
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardElement>
        </div>
 
           {/* Main Card Area - Art positioning stays consistent */}
@@ -768,7 +1085,17 @@ const CardCreator = () => {
               {!cardData.backgroundImage && (
                 <div style={{ position: 'absolute', inset: 0, zIndex: -20, ...artCheckerboardPattern }} />
               )}
-              <div style={{ width: '100%', height: '100%', backgroundColor: 'transparent', position: 'relative', zIndex: 10 }} />
+              <div 
+                className="card-background-area"
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  backgroundColor: selectedElement === 'background' ? cardColors[cardData.cardColor].fg : 'transparent', 
+                  position: 'relative', 
+                  zIndex: 10,
+                  transition: 'background-color 0.3s ease'
+                }} 
+              />
             </CardElement>
           </div>
 
@@ -793,7 +1120,7 @@ const CardCreator = () => {
                 height: `${150 * scale}px`,
                 backgroundColor: 'black',
                 bottom: cardData.fullArt ? `${-200 * scale}px` : `${57 * scale}px`,
-                left: cardData.fullArt ? `${-200 * scale}px` : `${56 * scale}px`,
+                left: cardData.fullArt ? `${-200 * scale}px` : `${55 * scale}px`,
                 clipPath: 'polygon(0 100%, 0 0, 100% 100%)',
                 display: 'block',
                 visibility: 'visible',
@@ -808,8 +1135,8 @@ const CardCreator = () => {
                 width: `${150 * scale}px`,
                 height: `${150 * scale}px`,
                 backgroundColor: 'black',
-                bottom: cardData.fullArt ? `${-200 * scale}px` : `${56 * scale}px`,
-                right: cardData.fullArt ? `${-200 * scale}px` : `${56 * scale}px`,
+                bottom: cardData.fullArt ? `${-200 * scale}px` : `${57 * scale}px`,
+                right: cardData.fullArt ? `${-200 * scale}px` : `${55 * scale}px`,
                 clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
                 display: 'block',
                 visibility: 'visible',
@@ -823,7 +1150,7 @@ const CardCreator = () => {
           {/* Gate Power Overlay - Left Side, Top Layer */}
           <CardElement elementType="gatePower" style={{
             position: 'absolute',
-            left: `${25 * scale}px`,
+            left: `${24 * scale}px`,
             top: `${308 * scale}px`,
             zIndex: 100,
             opacity: cardData.showGatePower ? 1 : 0,
@@ -897,55 +1224,135 @@ const CardCreator = () => {
                   padding: `${1 * scale}px ${4 * scale}px`,
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  position: 'relative'
                 }}>
+                  {/* First render: Stroke outline */}
+                  <span style={{
+                    color: 'transparent',
+                    fontWeight: '900',
+                    fontSize: `${6 * scale}px`,
+                    WebkitTextStroke: '0.5px black',
+                    position: 'absolute',
+                    zIndex: 1
+                  }}>
+                    {cardData.footerRarity}
+                  </span>
+                  {/* Second render: Clean text */}
                   <span style={{
                     color: 'black',
                     fontWeight: '900',
-                    fontSize: `${6 * scale}px`
+                    fontSize: `${6 * scale}px`,
+                    position: 'relative',
+                    zIndex: 2
                   }}>
                     {cardData.footerRarity}
                   </span>
                 </div>
               </CardElement>
               <CardElement elementType="footerLeft">
-                <span style={{
-                  color: 'black',
-                  fontWeight: '900',
-                  ...smallTextShadowStyle
-                }}>
-                  {cardData.footerLeft}
-                </span>
+                <div style={{ position: 'relative' }}>
+                  {/* First render: Stroke outline */}
+                  <span style={{
+                    color: 'transparent',
+                    fontWeight: '900',
+                    WebkitTextStroke: '1px white',
+                    position: 'absolute',
+                    zIndex: 1,
+                    ...helveticaFont
+                  }}>
+                    {cardData.footerLeft}
+                  </span>
+                  {/* Second render: Clean text */}
+                  <span style={{
+                    color: 'black',
+                    fontWeight: '900',
+                    position: 'relative',
+                    zIndex: 2,
+                    ...helveticaFont
+                  }}>
+                    {cardData.footerLeft}
+                  </span>
+                </div>
               </CardElement>
               <CardElement elementType="footerCenter">
-                <span style={{
-                  color: 'black',
-                  fontWeight: '900',
-                  fontStyle: 'italic',
-                  ...smallTextShadowStyle
-                }}>
-                  {cardData.footerCenter}
-                </span>
+                <div style={{ position: 'relative' }}>
+                  {/* First render: Stroke outline */}
+                  <span style={{
+                    color: 'transparent',
+                    fontWeight: '900',
+                    fontStyle: 'italic',
+                    WebkitTextStroke: '1px white',
+                    position: 'absolute',
+                    zIndex: 1,
+                    ...helveticaFont
+                  }}>
+                    {cardData.footerCenter}
+                  </span>
+                  {/* Second render: Clean text */}
+                  <span style={{
+                    color: 'black',
+                    fontWeight: '900',
+                    fontStyle: 'italic',
+                    position: 'relative',
+                    zIndex: 2,
+                    ...helveticaFont
+                  }}>
+                    {cardData.footerCenter}
+                  </span>
+                </div>
               </CardElement>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: `${3 * scale}px` }}>
               <CardElement elementType="setCode">
-                <span style={{
-                  color: 'black',
-                  fontWeight: '900',
-                  ...smallTextShadowStyle
-                }}>
-                  {cardData.setCode}
-                </span>
+                <div style={{ position: 'relative' }}>
+                  {/* First render: Stroke outline */}
+                  <span style={{
+                    color: 'transparent',
+                    fontWeight: '900',
+                    WebkitTextStroke: '1px white',
+                    position: 'absolute',
+                    zIndex: 1,
+                    ...helveticaFont
+                  }}>
+                    {cardData.setCode}
+                  </span>
+                  {/* Second render: Clean text */}
+                  <span style={{
+                    color: 'black',
+                    fontWeight: '900',
+                    position: 'relative',
+                    zIndex: 2,
+                    ...helveticaFont
+                  }}>
+                    {cardData.setCode}
+                  </span>
+                </div>
               </CardElement>
               <CardElement elementType="cardNumber">
-                <span style={{
-                  color: 'black',
-                  fontWeight: '900',
-                  ...smallTextShadowStyle
-                }}>
-                  #{cardData.cardNumber}
-                </span>
+                <div style={{ position: 'relative' }}>
+                  {/* First render: Stroke outline */}
+                  <span style={{
+                    color: 'transparent',
+                    fontWeight: '900',
+                    WebkitTextStroke: '1px white',
+                    position: 'absolute',
+                    zIndex: 1,
+                    ...helveticaFont
+                  }}>
+                    #{cardData.cardNumber}
+                  </span>
+                  {/* Second render: Clean text */}
+                  <span style={{
+                    color: 'black',
+                    fontWeight: '900',
+                    position: 'relative',
+                    zIndex: 2,
+                    ...helveticaFont
+                  }}>
+                    #{cardData.cardNumber}
+                  </span>
+                </div>
               </CardElement>
             </div>
           </div>
@@ -981,12 +1388,27 @@ const CardCreator = () => {
               fontSize: `${20 * scale}px`,
               fontWeight: '600'
             }}>
-              <span style={{
-                color: 'black',
-                ...smallTextShadowStyle
-              }}>
-                © {cardData.copyrightText}
-              </span>
+              <div style={{ position: 'relative' }}>
+                {/* First render: Stroke outline */}
+                <span style={{
+                  color: 'transparent',
+                  WebkitTextStroke: '1px white',
+                  position: 'absolute',
+                  zIndex: 1,
+                  ...helveticaFont
+                }}>
+                  © {cardData.copyrightText}
+                </span>
+                {/* Second render: Clean text */}
+                <span style={{
+                  color: 'black',
+                  position: 'relative',
+                  zIndex: 2,
+                  ...helveticaFont
+                }}>
+                  © {cardData.copyrightText}
+                </span>
+              </div>
             </div>
           </CardElement>
 
@@ -1078,7 +1500,7 @@ const CardCreator = () => {
             height: '523px',
             borderRadius: '16px',
             overflow: 'hidden',
-            opacity: 0.5,
+            opacity: 0.9,
             pointerEvents: 'none',
             zIndex: 1000
           }}>
