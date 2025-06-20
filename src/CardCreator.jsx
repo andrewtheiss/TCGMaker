@@ -34,7 +34,7 @@ const CardCreator = () => {
     showGatePower: true,
     footerLeft: 'STT 01-069',
     footerCenter: 'BBB',
-    footerRarity: 'U',
+    footerRarity: 'SAR',
     copyrightText: 'Your Name Here',
     raritySymbol: 'α',
     showRarityStamp: true,
@@ -1287,15 +1287,18 @@ const CardCreator = () => {
             bottom: `${102 * scale}px`,
             zIndex: 1000
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: `${4 * scale}px` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: `${4 * scale}px`, marginBottom: '-2px' }}>
               <CardElement elementType="footerRarity">
                 <div style={{
                   backgroundColor: 'white',
-                  border: `${1 * scale}px solid black`,
-                  borderRadius: '50%',
-                  padding: `${1 * scale}px ${4 * scale}px`,
+                  border: `${5 * scale}px solid black`,
+                  borderRadius: '40%',
+                  padding: `${2 * scale}px ${8 * scale}px`,
                   display: 'flex',
                   alignItems: 'center',
+                  lineHeight: '2px',
+                  marginBottom: '0px',
+                  marginLeft: '4px',
                   justifyContent: 'center',
                   position: 'relative'
                 }}>
@@ -1303,8 +1306,9 @@ const CardCreator = () => {
                   <span style={{
                     color: 'transparent',
                     fontWeight: '900',
-                    fontSize: `${6 * scale}px`,
-                    WebkitTextStroke: '0.5px black',
+                    lineHeight: '7px',
+                    fontSize: `${25 * scale}px`,
+                    WebkitTextStroke: '0.3px black',
                     position: 'absolute',
                     zIndex: 1
                   }}>
@@ -1314,7 +1318,8 @@ const CardCreator = () => {
                   <span style={{
                     color: 'black',
                     fontWeight: '900',
-                    fontSize: `${6 * scale}px`,
+                    lineHeight: '7px',
+                    fontSize: `${25 * scale}px`,
                     position: 'relative',
                     zIndex: 2
                   }}>
