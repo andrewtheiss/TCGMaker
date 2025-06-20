@@ -37,9 +37,9 @@ const CardCreator = () => {
     footerRarity: 'U',
     copyrightText: 'Your Name Here',
     elementMode: 'classic',
-    circularText: 'ELEMENTAL POWER',
+    circularText: 'ENTITY',
     showLeftIcons: true,
-    textRotation: 55,
+    textRotation: 32,
     flipCircularText: true
   });
 
@@ -885,18 +885,18 @@ const CardCreator = () => {
                 fontWeight: 'bold', 
                 margin: 0, 
                 lineHeight: `${80 * scale}px`, 
-                paddingLeft: cardData.showLeftIcons ? `${10 * scale}px` : `${50 * scale}px`,
-                WebkitTextStroke: cardData.fullArt ? '3px black' : 'none',
+                paddingLeft: cardData.showLeftIcons ? `${0 * scale}px` : `${0 * scale}px`,
+                WebkitTextStroke: cardData.fullArt ? '6px white' : 'none',
                 color: cardData.fullArt ? 'transparent' : 'white',
                 textShadow: cardData.fullArt ? 'none' : `
-                  -3px -3px 0 black,
-                  3px -3px 0 black,
-                  -3px 3px 0 black,
-                  3px 3px 0 black,
-                  0 3px 0 black,
-                  3px 0 0 black,
-                  0 -3px 0 black,
-                  -3px 0 0 black
+                  -6px -6px 0 black,
+                  6px -6px 0 black,
+                  -6px 6px 0 black,
+                  6px 6px 0 black,
+                  0 6px 0 black,
+                  6px 0 0 black,
+                  0 -6px 0 black,
+                  -6px 0 0 black
                 `,
                 position: 'absolute',
                 top: 0,
@@ -914,8 +914,8 @@ const CardCreator = () => {
                 fontWeight: 'bold', 
                 margin: 0, 
                 lineHeight: `${80 * scale}px`, 
-                paddingLeft: cardData.showLeftIcons ? `${10 * scale}px` : `${50 * scale}px`,
-                color: 'white',
+                paddingLeft: cardData.showLeftIcons ? `${0 * scale}px` : `${0 * scale}px`,
+                color: cardData.fullArt ? 'black' : 'white',
                 position: 'absolute',
                 top: 0,
                 left: 0,
@@ -928,7 +928,7 @@ const CardCreator = () => {
             </CardElement>
          
             {/* RIGHT ICON AREA - Top Right Corner Domain Element */}
-            <CardElement elementType="rightIcon" style={{ paddingRight: cardData.fullArt ? `${104 * scale}px` : 0, position: 'relative' }}>
+            <CardElement elementType="rightIcon" style={{ paddingRight: 0, position: 'relative' }}>
               {/* OUTERMOST CONTAINER - Main positioning container (220x220px) */}
               <div 
                 className="right-icon-outer-container"
@@ -936,6 +936,7 @@ const CardCreator = () => {
                   width: `${220 * scale}px`,
                   height: `${220 * scale}px`,
                   position: 'relative',
+                  left: '7px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -955,24 +956,24 @@ const CardCreator = () => {
                                               <path 
                         id="circle-path-stroke" 
                         d={cardData.flipCircularText 
-                          ? `M ${109.99 * scale} ${15 * scale} A ${95 * scale} ${95 * scale} 0 1 0 ${110 * scale} ${15 * scale}`
-                          : `M ${110 * scale} ${25 * scale} A ${85 * scale} ${85 * scale} 0 1 1 ${109.99 * scale} ${25 * scale}`
+                          ? `M ${109.99 * scale} ${20 * scale} A ${105 * scale} ${105 * scale} 0 1 0 ${110 * scale} ${20 * scale}`
+                          : `M ${110 * scale} ${20 * scale} A ${105 * scale} ${105 * scale} 0 1 1 ${109.99 * scale} ${20 * scale}`
                         }
                       />
                       </defs>
                       <text 
                         className="circular-text-stroke"
-                        fontSize={`${28 * scale}px`} 
+                        fontSize={`${40 * scale}px`} 
                         fill="transparent"
                         fontWeight="900"
                         stroke="black"
-                        strokeWidth={`${12 * scale}px`}
+                        strokeWidth={`${14 * scale}px`}
                         strokeLinejoin="round"
                         strokeLinecap="round"
                         style={{ 
                           ...helveticaFont,
                           fontWeight: '900',
-                          letterSpacing: `${3.5 * scale}px`
+                          letterSpacing: `${6.975 * scale}px`
                         }}
                       >
                         <textPath href="#circle-path-stroke" startOffset={`${cardData.textRotation}%`}>
@@ -984,29 +985,30 @@ const CardCreator = () => {
                     {/* CIRCULAR TEXT FILL - Second render with clean white text overlay */}
                     <svg 
                       className="circular-text-fill-svg"
+
                       width={`${220 * scale}px`} 
-                      height={`${220 * scale}px`} 
-                      style={{ position: 'absolute', top: 0, left: 0, zIndex: 2 }}
+                      height={`${520 * scale}px`} 
+                      style={{ position: 'absolute', top: 0, left: -1, zIndex: 2 }}
                     >
                       <defs>
                                               <path 
                         id="circle-path-fill" 
                         d={cardData.flipCircularText 
-                          ? `M ${109.99 * scale} ${15 * scale} A ${95 * scale} ${95 * scale} 0 1 0 ${110 * scale} ${15 * scale}`
-                          : `M ${110 * scale} ${25 * scale} A ${85 * scale} ${85 * scale} 0 1 1 ${109.99 * scale} ${25 * scale}`
+                          ? `M ${109.99 * scale} ${20 * scale} A ${105 * scale} ${105 * scale} 0 1 0 ${110 * scale} ${20 * scale}`
+                          : `M ${110 * scale} ${20 * scale} A ${105 * scale} ${105 * scale} 0 1 1 ${109.99 * scale} ${20 * scale}`
                         }
                       />
                       </defs>
                       <text 
                         className="circular-text-fill"
-                        fontSize={`${28 * scale}px`} 
+                        fontSize={`${40 * scale}px`} 
                         fill="white"
                         fontWeight="900"
                         stroke="none"
                         style={{ 
                           ...helveticaFont,
                           fontWeight: '900',
-                          letterSpacing: `${3.5 * scale}px`
+                          letterSpacing: `${6.975 * scale}px`
                         }}
                       >
                         <textPath href="#circle-path-fill" startOffset={`${cardData.textRotation}%`}>
@@ -1016,20 +1018,22 @@ const CardCreator = () => {
                     </svg>
                   </CardElement>
 
-                {/* WHITE BORDER RING - Middle ring with white border (200x200px) */}
+                {/* BLACK BORDER RING - Middle ring with black border (200x200px) */}
                 <div 
                   className="white-border-ring"
-                  style={{
-                    width: `${200 * scale}px`,
-                    height: `${200 * scale}px`,
-                    borderRadius: '50%',
-                    border: `${1 * scale}px solid white`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    backgroundColor: 'transparent'
-                  }}
+                                      style={{
+                      width: cardData.fullArt ? `${186 * scale}px` : `${280 * scale}px`,
+                      height: cardData.fullArt ? `${186 * scale}px` : `${270 * scale}px`,
+                      borderRadius: '50%',
+                      border: cardData.fullArt ? `${18 * scale}px solid black` : `${65 * scale}px solid black`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative',
+                      backgroundColor: 'transparent',
+                      boxSizing: 'border-box',
+                      aspectRatio: '1 / 1'
+                    }}
                 >
                   {/* DOMAIN ICON CONTAINER - Inner circle with domain image (120x120px) */}
                   <div 
@@ -1055,8 +1059,8 @@ const CardCreator = () => {
                       src={getDomainImage(cardData.rightIconDomain)}
                       alt={`${cardData.rightIconDomain} Domain`}
                       style={{
-                        width: '160%',
-                        height: '160%',
+                        width: '170%',
+                        height: '170%',
                         objectFit: 'contain',
                         filter: `sepia(1) hue-rotate(${hexToHue(cardColors[cardData.cardColor].fg) - 115}deg) saturate(13.1)`
                       }}
@@ -1150,8 +1154,8 @@ const CardCreator = () => {
           {/* Gate Power Overlay - Left Side, Top Layer */}
           <CardElement elementType="gatePower" style={{
             position: 'absolute',
-            left: `${24 * scale}px`,
-            top: `${308 * scale}px`,
+            left: `${22 * scale}px`,
+            top: `${306 * scale}px`,
             zIndex: 100,
             opacity: cardData.showGatePower ? 1 : 0,
             pointerEvents: 'all'
