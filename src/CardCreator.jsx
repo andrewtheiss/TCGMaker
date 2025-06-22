@@ -4,11 +4,14 @@ import beanImage from './assets/bean.png';
 import cardogImage from './assets/jade.png';
 import gatePowerImage from './assets/gatepower.png';
 import izkWhiteImage from './assets/ikz_white.png';
+import ikzBgImage from './assets/ikzbg.png';
 import waterImage from './assets/domain/water.png';
 import earthImage from './assets/domain/earth.png';
 import smokeImage from './assets/domain/smoke.png';
 import lightningImage from './assets/domain/lightning.png';
+import fireImage from './assets/domain/fire.png';
 import CardElements from './CardElements';
+import LeaderHeader from './LeaderHeader';
 
 const CardCreator = () => {
   const [cardData, setCardData] = useState({
@@ -18,8 +21,10 @@ const CardCreator = () => {
     subtype: 'Elder Warrior',
     showSubtype: true,
     textBox: 'Card ability text goes here.',
-    power: '3',
-    toughness: '4',
+    attack: '3',
+    defense: '4',
+    showAttack: true,
+    showDefense: true,
     fullArt: false,
     domain: 'water',
     backgroundImage: null,
@@ -42,11 +47,15 @@ const CardCreator = () => {
     circularText: 'ENTITY',
     showLeftIcons: true,
     textRotation: 32,
-    flipCircularText: true
+    flipCircularText: true,
+    // Leader-specific fields
+    leaderDescription1: 'Primary Title',
+    leaderDescription2: 'Secondary Description'
   });
 
   const [selectedElement, setSelectedElement] = useState(null);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [showCardBack, setShowCardBack] = useState(false);
   const fileInputRef = useRef(null);
   const overlayInputRef = useRef(null);
   const cardRef = useRef(null);
@@ -87,6 +96,7 @@ const CardCreator = () => {
       case 'earth': return earthImage;
       case 'smoke': return smokeImage;
       case 'lightning': return lightningImage;
+      case 'fire': return fireImage;
       default: return waterImage;
     }
   };
@@ -104,7 +114,8 @@ const CardCreator = () => {
     purp: { bg: '#6c449a', fg: '#dc8fc7' },
     yellow: { bg: '#ca722b', fg: '#ffbf2e' },
     smoke: { bg: '#686463', fg: '#cec5c0' },
-    blue: { bg: '#5289c9', fg: '#75d0e2' }
+    blue: { bg: '#5289c9', fg: '#75d0e2' },
+    fire: { bg: '#c4353d', fg: '#ff4026' }
   };
 
   const rarityColors = {
@@ -155,7 +166,10 @@ const CardCreator = () => {
         });
         
         const link = document.createElement('a');
-        link.download = `${cardData.name.replace(/\s+/g, '_')}_card.png`;
+        const fileName = showCardBack 
+          ? `${cardData.name.replace(/\s+/g, '_')}_card_back.png`
+          : `${cardData.name.replace(/\s+/g, '_')}_card.png`;
+        link.download = fileName;
         link.href = canvas.toDataURL('image/png');
         link.click();
       } catch (error) {
@@ -166,8 +180,65 @@ const CardCreator = () => {
   };
 
   const updateCardData = (field, value) => {
-    setCardData({ ...cardData, [field]: value });
+    const newData = { ...cardData, [field]: value };
+    
+    // Set default stat visibility when card type changes
+    if (field === 'type') {
+      switch (value) {
+        case 'leader':
+          newData.showAttack = false;
+          newData.showDefense = true;
+          newData.fullArt = true; // Leader cards are full art by default
+          break;
+        case 'equipment':
+          newData.showAttack = true;
+          newData.showDefense = false;
+          break;
+        case 'creature':
+        default:
+          newData.showAttack = true;
+          newData.showDefense = true;
+          break;
+      }
+    }
+    
+    setCardData(newData);
   };
+
+  // Card Back component
+  const CardBack = () => (
+    <div style={{
+      position: 'relative',
+      backgroundColor: 'black',
+      borderRadius: `${64 * scale}px`,
+      overflow: 'hidden',
+      width: `${cardWidth * scale}px`,
+      height: `${cardHeight * scale}px`,
+      border: `${8 * scale}px solid black`,
+      boxSizing: 'border-box'
+    }}>
+      {/* Background image taking up most of the card */}
+      <div style={{
+        position: 'absolute',
+        top: `${16 * scale}px`,
+        left: `${16 * scale}px`,
+        right: `${16 * scale}px`,
+        bottom: `${16 * scale}px`,
+        borderRadius: `${48 * scale}px`,
+        overflow: 'hidden'
+      }}>
+        <img 
+          src={ikzBgImage} 
+          alt="Card back" 
+          style={{ 
+            width: '100%', 
+            height: '100%', 
+            objectFit: 'cover'
+          }}
+        />
+      </div>
+    </div>
+  );
 
   const CardElement = ({ children, elementType, style = {} }) => (
     <div
@@ -289,6 +360,7 @@ const CardCreator = () => {
               <option value="earth">Earth</option>
               <option value="smoke">Smoke</option>
               <option value="lightning">Lightning</option>
+              <option value="fire">Fire</option>
             </select>
 
             <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px', marginTop: '12px' }}>
@@ -316,13 +388,15 @@ const CardCreator = () => {
             <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px' }}>
               Card Type
             </label>
-            <input
-              type="text"
+            <select
               value={cardData.type}
               onChange={(e) => updateCardData('type', e.target.value)}
               style={inputStyle}
-              placeholder="creature, spell, equipment, etc."
-            />
+            >
+              <option value="creature">Creature</option>
+              <option value="equipment">Equipment</option>
+              <option value="leader">Leader</option>
+            </select>
             
             <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px', marginTop: '8px' }}>
               <input
@@ -345,6 +419,35 @@ const CardCreator = () => {
                   onChange={(e) => updateCardData('subtype', e.target.value)}
                   style={inputStyle}
                   placeholder="Elder Warrior, etc."
+                />
+              </>
+            )}
+            
+            {cardData.type === 'leader' && (
+              <>
+                <div style={{ fontSize: '12px', color: '#888', marginTop: '8px', marginBottom: '8px' }}>
+                  💡 Leader cards show special header bars on the top right
+                </div>
+                <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px', marginTop: '12px' }}>
+                  Leader Description 1 (Top Bar)
+                </label>
+                <input
+                  type="text"
+                  value={cardData.leaderDescription1}
+                  onChange={(e) => updateCardData('leaderDescription1', e.target.value)}
+                  style={inputStyle}
+                  placeholder="Primary Title"
+                />
+                
+                <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px', marginTop: '8px' }}>
+                  Leader Description 2 (Bottom Bar)
+                </label>
+                <input
+                  type="text"
+                  value={cardData.leaderDescription2}
+                  onChange={(e) => updateCardData('leaderDescription2', e.target.value)}
+                  style={inputStyle}
+                  placeholder="Secondary Description"
                 />
               </>
             )}
@@ -633,20 +736,55 @@ Examples:
         
         {selectedElement === 'stats' && (
           <div>
-            <input
-              type="text"
-              value={cardData.power}
-              onChange={(e) => updateCardData('power', e.target.value)}
-              style={inputStyle}
-              placeholder="Power"
-            />
-            <input
-              type="text"
-              value={cardData.toughness}
-              onChange={(e) => updateCardData('toughness', e.target.value)}
-              style={inputStyle}
-              placeholder="Toughness"
-            />
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Attack & Defense Stats
+            </label>
+            
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px' }}>
+                <input
+                  type="checkbox"
+                  checked={cardData.showAttack}
+                  onChange={(e) => updateCardData('showAttack', e.target.checked)}
+                  style={{ marginRight: '8px' }}
+                />
+                Show Attack
+              </label>
+              {cardData.showAttack && (
+                <input
+                  type="text"
+                  value={cardData.attack}
+                  onChange={(e) => updateCardData('attack', e.target.value)}
+                  style={inputStyle}
+                  placeholder="Attack"
+                />
+              )}
+            </div>
+            
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px' }}>
+                <input
+                  type="checkbox"
+                  checked={cardData.showDefense}
+                  onChange={(e) => updateCardData('showDefense', e.target.checked)}
+                  style={{ marginRight: '8px' }}
+                />
+                Show Defense
+              </label>
+              {cardData.showDefense && (
+                <input
+                  type="text"
+                  value={cardData.defense}
+                  onChange={(e) => updateCardData('defense', e.target.value)}
+                  style={inputStyle}
+                  placeholder="Defense"
+                />
+              )}
+            </div>
+            
+            <div style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>
+              💡 Defaults: Leader = Defense only, Equipment = Attack only, Creature = Both
+            </div>
           </div>
         )}
         
@@ -780,7 +918,77 @@ Examples:
             placeholder="Copyright Name"
           />
         )}
+
+        {selectedElement === 'leaderDescription1' && (
+          <div>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Leader Description 1 (Top Bar)
+            </label>
+            <input
+              type="text"
+              value={cardData.leaderDescription1}
+              onChange={(e) => updateCardData('leaderDescription1', e.target.value)}
+              style={inputStyle}
+              placeholder="Primary Title - appears on longer top bar"
+            />
+            <div style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
+              This appears in the top (longer) bar on the right side of leader cards.
+            </div>
+          </div>
+        )}
+
+        {selectedElement === 'leaderDescription2' && (
+          <div>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Leader Description 2 (Bottom Bar)
+            </label>
+            <input
+              type="text"
+              value={cardData.leaderDescription2}
+              onChange={(e) => updateCardData('leaderDescription2', e.target.value)}
+              style={inputStyle}
+              placeholder="Secondary Title - appears on shorter bottom bar"
+            />
+            <div style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
+              This appears in the bottom (shorter) bar on the right side of leader cards.
+            </div>
+          </div>
+        )}
         
+        {selectedElement === 'cardType' && (
+          <div>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Card Type Selection
+            </label>
+            {[
+              { value: 'creature', label: 'Classic', desc: 'Standard creature cards with attack & defense' },
+              { value: 'equipment', label: 'Equipment', desc: 'Equipment cards with attack focus' },
+              { value: 'leader', label: 'Leader', desc: 'Leader cards with special header & defense focus' }
+            ].map(({ value, label, desc }) => (
+              <button
+                key={value}
+                onClick={() => updateCardData('type', value)}
+                style={{
+                  ...inputStyle,
+                  backgroundColor: cardData.type === value ? '#3b82f6' : '#f9fafb',
+                  color: cardData.type === value ? 'white' : 'black',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  cursor: 'pointer',
+                  marginBottom: '4px',
+                  padding: '12px'
+                }}
+              >
+                <span style={{ fontWeight: '600', marginBottom: '2px' }}>{label}</span>
+                <span style={{ fontSize: '12px', opacity: 0.8, lineHeight: '1.3' }}>
+                  {desc}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
         {selectedElement === 'elementMode' && (
           <div>
             <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
@@ -978,6 +1186,11 @@ Examples:
             transformOrigin: 'center'
           }}
         >
+          {showCardBack ? (
+            <CardBack />
+          ) : (
+            <>
+              {/* Front card content */}
           {/* Background Image - Full Card */}
           <div style={{ position: 'absolute', inset: 0 }}>
             {cardData.backgroundImage ? (
@@ -1009,8 +1222,20 @@ Examples:
             }}
           />
 
-          {/* Header - Absolutely positioned */}
-          <div className="card-header-container" style={{
+          {/* Leader Header - Only for leader cards */}
+          {cardData.type === 'leader' && (
+            <LeaderHeader 
+              cardData={cardData}
+              CardElement={CardElement}
+              cardColors={cardColors}
+              scale={scale}
+              helveticaFont={helveticaFont}
+            />
+          )}
+
+          {/* Header - Absolutely positioned (hidden for leader cards) */}
+          {cardData.type !== 'leader' && (
+            <div className="card-header-container" style={{
             position: 'absolute',
             top: `${50 * scale}px`,
             left: cardData.fullArt ? `${38 * scale}px` : `${38 * scale}px`,
@@ -1362,6 +1587,9 @@ Examples:
               </div>
             </CardElement>
        </div>
+          )}
+          
+          {/* End of header container */}
 
           {/* Main Card Area - Art positioning stays consistent */}
             <div style={{
@@ -1834,6 +2062,8 @@ Examples:
             mode={cardData.elementMode}
             updateCardData={updateCardData}
           />
+            </>
+          )}
         </div>
         
         {/* Reference Overlay */}
@@ -1890,7 +2120,23 @@ Examples:
             fontWeight: '500'
           }}
         >
-          📥 Download Card
+          📥 Download {showCardBack ? 'Card Back' : 'Card'}
+        </button>
+        
+        <button
+          onClick={() => setShowCardBack(!showCardBack)}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: showCardBack ? '#dc2626' : '#2563eb',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '500'
+          }}
+        >
+          {showCardBack ? '🔄 Show Front' : '🔄 Show Back'}
         </button>
         
         <button
@@ -1910,7 +2156,7 @@ Examples:
         </button>
         
         <button
-          onClick={() => setSelectedElement('elementMode')}
+          onClick={() => setSelectedElement('cardType')}
           style={{
             padding: '8px 16px',
             backgroundColor: '#7c3aed',
@@ -1922,7 +2168,7 @@ Examples:
             fontWeight: '500'
           }}
         >
-          🎨 Mode: {cardData.elementMode}
+          🃏 Card Type: {cardData.type === 'creature' ? 'Classic' : cardData.type === 'equipment' ? 'Equipment' : 'Leader'}
         </button>
         
         {cardData.overlayImage && (
