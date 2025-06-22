@@ -53,7 +53,9 @@ const CardCreator = () => {
     flipCircularText: true,
     // Leader-specific fields
     leaderDescription1: 'Primary Title',
-    leaderDescription2: 'Secondary Description'
+    leaderDescription2: 'Secondary Description',
+    // Equipment-specific fields
+    equipmentShowBackground: true
   });
 
   const [selectedElement, setSelectedElement] = useState(null);
@@ -304,13 +306,36 @@ const CardCreator = () => {
           <h3 style={{ fontWeight: 'bold', marginBottom: '12px' }}>Edit {selectedElement}</h3>
         
         {selectedElement === 'cardName' && (
-          <input
-            type="text"
-            value={cardData.name}
-            onChange={(e) => updateCardData('name', e.target.value)}
-            style={inputStyle}
-            placeholder="Card Name"
-          />
+          <div>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Card Name
+            </label>
+            <input
+              type="text"
+              value={cardData.name}
+              onChange={(e) => updateCardData('name', e.target.value)}
+              style={inputStyle}
+              placeholder="Card Name"
+            />
+            
+            {/* Equipment-specific background toggle */}
+            {cardData.type === 'equipment' && (
+              <>
+                <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px', marginTop: '12px' }}>
+                  <input
+                    type="checkbox"
+                    checked={cardData.equipmentShowBackground}
+                    onChange={(e) => updateCardData('equipmentShowBackground', e.target.checked)}
+                    style={{ marginRight: '8px' }}
+                  />
+                  Show Equipment Name Background
+                </label>
+                <div style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
+                  Toggle the black background and border for the equipment name bar
+                </div>
+              </>
+            )}
+          </div>
         )}
         
 
@@ -423,6 +448,27 @@ const CardCreator = () => {
                   style={inputStyle}
                   placeholder="Elder Warrior, etc."
                 />
+              </>
+            )}
+            
+            {cardData.type === 'equipment' && (
+              <>
+                <div style={{ fontSize: '12px', color: '#888', marginTop: '8px', marginBottom: '8px' }}>
+                  💡 Equipment cards show the name bar positioned under the attack stats
+                </div>
+                
+                <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px', marginTop: '12px' }}>
+                  <input
+                    type="checkbox"
+                    checked={cardData.equipmentShowBackground}
+                    onChange={(e) => updateCardData('equipmentShowBackground', e.target.checked)}
+                    style={{ marginRight: '8px' }}
+                  />
+                  Show Equipment Name Background
+                </label>
+                <div style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
+                  Toggle the black background and border for the equipment name bar
+                </div>
               </>
             )}
             
@@ -1213,21 +1259,23 @@ Examples:
           
 
           
-          {/* Card Name Background Container - Absolutely positioned */}
-          <div 
-            className={`card-name-background card-name-background-${cardData.type}`}
-            style={{
-              position: 'absolute',
-              top: `${47 * scale}px`,
-              left: 0,
-              right: cardData.fullArt ? 0 : `${0 * scale}px`,
-              height: `${128 * scale}px`,
-              backgroundColor: cardData.fullArt ? 'transparent' : 'black',
-              borderRadius: cardData.fullArt ? '0' : `${48 * scale}px ${48 * scale}px 0 0`,
-              zIndex: 14,
-              pointerEvents: 'none'
-            }}
-          />
+          {/* Card Name Background Container - Absolutely positioned (hidden for equipment cards) */}
+          {cardData.type !== 'equipment' && (
+            <div 
+              className={`card-name-background card-name-background-${cardData.type}`}
+              style={{
+                position: 'absolute',
+                top: `${47 * scale}px`,
+                left: 0,
+                right: cardData.fullArt ? 0 : `${0 * scale}px`,
+                height: `${128 * scale}px`,
+                backgroundColor: cardData.fullArt ? 'transparent' : 'black',
+                borderRadius: cardData.fullArt ? '0' : `${48 * scale}px ${48 * scale}px 0 0`,
+                zIndex: 14,
+                pointerEvents: 'none'
+              }}
+            />
+          )}
 
           {/* Leader Header - Only for leader cards */}
           {cardData.type === 'leader' && (
@@ -1373,61 +1421,63 @@ Examples:
               )}
          </div>
          
-            {/* Card Name */}
-            <CardElement elementType="cardName" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', height: `${80 * scale}px`, minWidth: `${cardWidth * 0.4 * scale}px`, position: 'relative' }}>
-              {/* First render: Stroke outline */}
-              <h2 
-                className={`card-name-stroke card-name-stroke-${cardData.type}`}
-                style={{ 
-                  fontSize: `${92 * scale}px`, 
-                  fontWeight: 'bold', 
-                  margin: 0, 
-                  lineHeight: `${80 * scale}px`, 
-                  paddingLeft: cardData.showLeftIcons ? `${0 * scale}px` : `${0 * scale}px`,
-                  WebkitTextStroke: cardData.fullArt ? '6px white' : 'none',
-                  color: cardData.fullArt ? 'transparent' : 'white',
-                  textShadow: cardData.fullArt ? 'none' : `
-                    -6px -6px 0 black,
-                    6px -6px 0 black,
-                    -6px 6px 0 black,
-                    6px 6px 0 black,
-                    0 6px 0 black,
-                    6px 0 0 black,
-                    0 -6px 0 black,
-                    -6px 0 0 black
-                  `,
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  zIndex: 1,
-                  ...helveticaFont 
-                }}
-              >
-                {cardData.name}
-              </h2>
-              
-              {/* Second render: Clean text overlay */}
-              <h2 
-                className={`card-name-text card-name-text-${cardData.type}`}
-                style={{ 
-                  fontSize: `${92 * scale}px`, 
-                  fontWeight: 'bold', 
-                  margin: 0, 
-                  lineHeight: `${80 * scale}px`, 
-                  paddingLeft: cardData.showLeftIcons ? `${0 * scale}px` : `${0 * scale}px`,
-                  color: cardData.fullArt ? 'black' : 'white',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  zIndex: 2,
-                  ...helveticaFont 
-                }}
-              >
-                {cardData.name}
-              </h2>
-            </CardElement>
+            {/* Card Name (hidden for equipment cards) */}
+            {cardData.type !== 'equipment' && (
+              <CardElement elementType="cardName" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', height: `${80 * scale}px`, minWidth: `${cardWidth * 0.4 * scale}px`, position: 'relative' }}>
+                {/* First render: Stroke outline */}
+                <h2 
+                  className={`card-name-stroke card-name-stroke-${cardData.type}`}
+                  style={{ 
+                    fontSize: `${92 * scale}px`, 
+                    fontWeight: 'bold', 
+                    margin: 0, 
+                    lineHeight: `${80 * scale}px`, 
+                    paddingLeft: cardData.showLeftIcons ? `${0 * scale}px` : `${0 * scale}px`,
+                    WebkitTextStroke: cardData.fullArt ? '6px white' : 'none',
+                    color: cardData.fullArt ? 'transparent' : 'white',
+                    textShadow: cardData.fullArt ? 'none' : `
+                      -6px -6px 0 black,
+                      6px -6px 0 black,
+                      -6px 6px 0 black,
+                      6px 6px 0 black,
+                      0 6px 0 black,
+                      6px 0 0 black,
+                      0 -6px 0 black,
+                      -6px 0 0 black
+                    `,
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    zIndex: 1,
+                    ...helveticaFont 
+                  }}
+                >
+                  {cardData.name}
+                </h2>
+                
+                {/* Second render: Clean text overlay */}
+                <h2 
+                  className={`card-name-text card-name-text-${cardData.type}`}
+                  style={{ 
+                    fontSize: `${92 * scale}px`, 
+                    fontWeight: 'bold', 
+                    margin: 0, 
+                    lineHeight: `${80 * scale}px`, 
+                    paddingLeft: cardData.showLeftIcons ? `${0 * scale}px` : `${0 * scale}px`,
+                    color: cardData.fullArt ? 'black' : 'white',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    zIndex: 2,
+                    ...helveticaFont 
+                  }}
+                >
+                  {cardData.name}
+                </h2>
+              </CardElement>
+            )}
          
             {/* RIGHT ICON AREA - Top Right Corner Domain Element */}
             <CardElement elementType="rightIcon" style={{ paddingRight: 0, position: 'relative' }}>
@@ -1854,6 +1904,75 @@ Examples:
             CardElement={CardElement}
             scale={scale}
           />
+
+          {/* Equipment Card Name Bar - positioned just under attack stats */}
+          {cardData.type === 'equipment' && (
+            <CardElement elementType="cardName" style={{ 
+              position: 'absolute', 
+              left: `${cardWidth * 0.05 * scale}px`, 
+              right: `${cardWidth * 0.15 * scale}px`, 
+              bottom: cardData.equipmentShowBackground ? `${410 * scale}px` : `${420 * scale}px`, 
+              zIndex: 1010
+            }}>
+              <div style={{
+                position: 'relative',
+                width: `${cardWidth * 0.9 * scale}px`,
+                height: `${119 * scale}px`,
+                backgroundColor: cardData.equipmentShowBackground ? 'black' : 'transparent',
+                border: cardData.equipmentShowBackground ? `${10 * scale}px solid #555555` : 'none',
+                borderRadius: cardData.equipmentShowBackground ? `${65 * scale}px` : '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {/* First render: Stroke outline */}
+                <h2 
+                  className={`equipment-card-name-stroke equipment-card-name-stroke-${cardData.type}`}
+                  style={{ 
+                    fontSize: `${100 * scale}px`, 
+                    fontWeight: 'bold', 
+                    margin: 0, 
+                    lineHeight: `${119 * scale}px`,
+                    WebkitTextStroke: !cardData.equipmentShowBackground ? '6px white' : 'none',
+                    color: !cardData.equipmentShowBackground ? 'transparent' : 'transparent',
+                    textShadow: !cardData.equipmentShowBackground ? 'none' : 'none',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '100%',
+                    textAlign: 'center',
+                    zIndex: 1,
+                    ...helveticaFont 
+                  }}
+                >
+                  {cardData.name}
+                </h2>
+                
+                {/* Second render: Clean text overlay */}
+                <h2 
+                  className={`equipment-card-name-text equipment-card-name-text-${cardData.type}`}
+                  style={{ 
+                    fontSize: `${100 * scale}px`, 
+                    fontWeight: 'bold', 
+                    margin: 0, 
+                    lineHeight: `${119 * scale}px`,
+                    color: cardData.equipmentShowBackground ? 'white' : 'black',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '100%',
+                    textAlign: 'center',
+                    zIndex: 2,
+                    ...helveticaFont 
+                  }}
+                >
+                  {cardData.name}
+                </h2>
+              </div>
+            </CardElement>
+          )}
 
           {/* CardElements component - handles type line, horizontal bar, text box, and stats */}
           <CardElements 

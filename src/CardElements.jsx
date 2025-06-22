@@ -15,16 +15,19 @@ const CardElements = ({
 }) => {
   
   // Define mode-specific styles - all modes are same as classic for now
+  // Equipment mode positioning is raised by 50px
+  const equipmentOffset = cardData.type === 'equipment' ? 180 : 0;
+  
   const classicStyle = {
     typeLine: {
       height: '17px',
-      bottom: `${148 * scale}px`,
+      bottom: `${(148 + equipmentOffset) * scale}px`,
       fontSize: '12.5px',
       borderRadius: '0px'
     },
     horizontalBar: {
       height: '3px',
-      bottom: `${176 * scale}px`,
+      bottom: `${(176 + equipmentOffset) * scale}px`,
       width: `${cardWidth * 0.7 * scale}px`
     },
     textBox: {
