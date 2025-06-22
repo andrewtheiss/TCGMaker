@@ -1,6 +1,13 @@
 import React from 'react';
 
 const CardStats = ({ cardData, CardElement, currentMode, scale, helveticaFont }) => {
+  // Helper function to check if attack value contains + or - symbols
+  const hasModifierSymbol = (value) => {
+    return value && (value.toString().includes('+') || value.toString().includes('-'));
+  };
+
+  const attackHasModifier = hasModifierSymbol(cardData.attack);
+
   return (
     <>
       {/* Attack/Defense stats - positioned absolutely to card */}
@@ -20,6 +27,21 @@ const CardStats = ({ cardData, CardElement, currentMode, scale, helveticaFont })
                 left: -1.5,
                 zIndex: 999
               }}>
+                {/* Extra outer border for +/- values */}
+                {attackHasModifier && (
+                  <div style={{
+                    position: 'absolute',
+                    top: `${-8 * scale}px`,
+                    left: `${-8 * scale}px`,
+                    width: `${173 * scale}px`,
+                    height: `${173 * scale}px`,
+                    backgroundColor: '#666666',
+                    transform: currentMode.statsDiamonds.transform,
+                    borderRadius: '8px',
+                    zIndex: -1
+                  }} />
+                )}
+                
                 {/* Outer black border */}
                 <div style={{
                   width: `${157 * scale}px`,
@@ -53,12 +75,39 @@ const CardStats = ({ cardData, CardElement, currentMode, scale, helveticaFont })
                       justifyContent: 'center',
                       fontWeight: 'bold',
                       borderRadius: currentMode.statsDiamonds.borderRadius,
-                      WebkitTextStroke: '1px white',
+                      WebkitTextStroke: '0.5px white',
                       fontSize: `${95 * scale}px`,
                       ...helveticaFont
                     }}>
-                      <span style={{ transform: 'rotate(-45deg)' }}>
-                        {cardData.attack}
+                      <span style={{ 
+                        transform: 'rotate(-45deg)',
+                        // Better centering for +/- text
+                        marginTop: attackHasModifier ? `${10 * scale}px` : '0',
+                        marginLeft: attackHasModifier ? `${-30 * scale}px` : '0',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {attackHasModifier && (cardData.attack.includes('+') || cardData.attack.includes('-')) ? (
+                          <>
+                            <span style={{ 
+                              fontSize: `${(95 - 20) * scale}px`,
+                              lineHeight: 1,
+                              marginRight: `${2 * scale}px`
+                            }}>
+                              {cardData.attack.charAt(0)}
+                            </span>
+                            <span style={{ 
+                              marginTop: `${10 * scale}px`,
+                              lineHeight: 1
+                            }}>
+                              {cardData.attack.slice(1)}
+                            </span>
+                          </>
+                        ) : (
+                          cardData.attack
+                        )}
                       </span>
                     </div>
                   </div>
@@ -106,7 +155,7 @@ const CardStats = ({ cardData, CardElement, currentMode, scale, helveticaFont })
                       justifyContent: 'center',
                       fontWeight: 'bold',
                       borderRadius: currentMode.statsDiamonds.borderRadius,
-                      WebkitTextStroke: '1px black',
+                      WebkitTextStroke: '0.5px black',
                       fontSize: `${100 * scale}px`,
                       ...helveticaFont
                     }}>

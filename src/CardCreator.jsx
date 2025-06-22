@@ -1195,23 +1195,27 @@ Examples:
             <>
               {/* Front card content */}
           {/* Background Image - Full Card */}
-          <div style={{ position: 'absolute', inset: 0 }}>
+          <CardElement elementType="cardBackground" style={{ position: 'absolute', inset: 0 }}>
             {cardData.backgroundImage ? (
               <img 
                 src={cardData.backgroundImage} 
                 alt="Card background" 
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                className={`card-background card-background-${cardData.type}`}
               />
             ) : (
-              <div style={{ width: '100%', height: '100%', zIndex: -20, ...checkerboardPattern }} />
+              <div 
+                style={{ width: '100%', height: '100%', zIndex: -20, ...checkerboardPattern }} 
+                className={`card-background-placeholder card-background-placeholder-${cardData.type}`}
+              />
             )}
-          </div>
+          </CardElement>
           
 
           
           {/* Card Name Background Container - Absolutely positioned */}
           <div 
-            className="card-name-background"
+            className={`card-name-background card-name-background-${cardData.type}`}
             style={{
               position: 'absolute',
               top: `${47 * scale}px`,
@@ -1238,7 +1242,7 @@ Examples:
 
           {/* Header - Absolutely positioned (hidden for leader cards) */}
           {cardData.type !== 'leader' && (
-            <div className="card-header-container" style={{
+            <div className={`card-header-container card-header-container-${cardData.type}`} style={{
             position: 'absolute',
             top: `${50 * scale}px`,
             left: cardData.fullArt ? `${38 * scale}px` : `${38 * scale}px`,
@@ -1305,107 +1309,122 @@ Examples:
               {/* Card Color bubble */}
               {cardData.showLeftIcons && (
                 <CardElement elementType="cardColor">
-                  <div style={{
-                    width: `${149 * scale}px`,
-                    height: `${149 * scale}px`,
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    zIndex: 10,
-                    backgroundColor: cardColors[cardData.cardColor].bg,
-                    border: `${0 * scale}px solid white`,
-                    overflow: 'hidden'
-                  }}>
-                 <img 
-                   src={izkWhiteImage}
-                   alt="IZK"
-                   style={{
-                     width: '92%',
-                     height: '92%',
-                     objectFit: 'contain',
-                     filter: `sepia(1) hue-rotate(${hexToHue(cardColors[cardData.cardColor].fg) - 115}deg) saturate(13.1)`
-                   }}
-                 />
-               </div>
-             </CardElement>
+                  <div 
+                    className={`card-color-bubble card-color-bubble-${cardData.type}`}
+                    style={{
+                      width: `${149 * scale}px`,
+                      height: `${149 * scale}px`,
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative',
+                      zIndex: 10,
+                      backgroundColor: cardColors[cardData.cardColor].bg,
+                      border: `${0 * scale}px solid white`,
+                      overflow: 'hidden'
+                    }}
+                  >
+                   <img 
+                     src={izkWhiteImage}
+                     alt="IZK"
+                     className={`card-color-icon card-color-icon-${cardData.type}`}
+                     style={{
+                       width: '92%',
+                       height: '92%',
+                       objectFit: 'contain',
+                       filter: `sepia(1) hue-rotate(${hexToHue(cardColors[cardData.cardColor].fg) - 115}deg) saturate(13.1)`
+                     }}
+                   />
+                 </div>
+               </CardElement>
               )}
            
               {/* Left Icon */}
               {cardData.leftIcon && cardData.showLeftIcons && (
                 <CardElement elementType="leftIcon">
-                  <div style={{
-                    width: `${120 * scale}px`,
-                    height: `${140 * scale}px`,
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'left',
-                    justifyContent: 'left',
-                    fontSize: `${105 * scale}px`,
-                    lineHeight: `${145 * scale}px`,
-                    fontWeight: 'bold',
-                    color: 'white',
-                    position: 'relative',
-                    zIndex: 10,
-                    WebkitTextStroke: '1px white',
-                    left: `${18 * scale}px`,
-                    marginRight: `${36 * scale}px`,
-                    backgroundColor: cardColors[cardData.cardColor].bg,
-                    fontFamily: 'system-ui !important',
-                  }}>
-                 {cardData.leftIcon}
-               </div>
-             </CardElement>
+                  <div 
+                    className={`left-icon-container left-icon-container-${cardData.type}`}
+                    style={{
+                      width: `${120 * scale}px`,
+                      height: `${140 * scale}px`,
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'left',
+                      justifyContent: 'left',
+                      fontSize: `${105 * scale}px`,
+                      lineHeight: `${145 * scale}px`,
+                      fontWeight: 'bold',
+                      color: 'white',
+                      position: 'relative',
+                      zIndex: 10,
+                      WebkitTextStroke: '1px white',
+                      left: `${18 * scale}px`,
+                      marginRight: `${36 * scale}px`,
+                      backgroundColor: cardColors[cardData.cardColor].bg,
+                      fontFamily: 'system-ui !important',
+                    }}
+                  >
+                   <span className={`left-icon-text left-icon-text-${cardData.type}`}>
+                     {cardData.leftIcon}
+                   </span>
+                 </div>
+               </CardElement>
               )}
          </div>
          
             {/* Card Name */}
             <CardElement elementType="cardName" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', height: `${80 * scale}px`, minWidth: `${cardWidth * 0.4 * scale}px`, position: 'relative' }}>
               {/* First render: Stroke outline */}
-              <h2 style={{ 
-                fontSize: `${92 * scale}px`, 
-                fontWeight: 'bold', 
-                margin: 0, 
-                lineHeight: `${80 * scale}px`, 
-                paddingLeft: cardData.showLeftIcons ? `${0 * scale}px` : `${0 * scale}px`,
-                WebkitTextStroke: cardData.fullArt ? '6px white' : 'none',
-                color: cardData.fullArt ? 'transparent' : 'white',
-                textShadow: cardData.fullArt ? 'none' : `
-                  -6px -6px 0 black,
-                  6px -6px 0 black,
-                  -6px 6px 0 black,
-                  6px 6px 0 black,
-                  0 6px 0 black,
-                  6px 0 0 black,
-                  0 -6px 0 black,
-                  -6px 0 0 black
-                `,
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                zIndex: 1,
-                ...helveticaFont 
-              }}>
+              <h2 
+                className={`card-name-stroke card-name-stroke-${cardData.type}`}
+                style={{ 
+                  fontSize: `${92 * scale}px`, 
+                  fontWeight: 'bold', 
+                  margin: 0, 
+                  lineHeight: `${80 * scale}px`, 
+                  paddingLeft: cardData.showLeftIcons ? `${0 * scale}px` : `${0 * scale}px`,
+                  WebkitTextStroke: cardData.fullArt ? '6px white' : 'none',
+                  color: cardData.fullArt ? 'transparent' : 'white',
+                  textShadow: cardData.fullArt ? 'none' : `
+                    -6px -6px 0 black,
+                    6px -6px 0 black,
+                    -6px 6px 0 black,
+                    6px 6px 0 black,
+                    0 6px 0 black,
+                    6px 0 0 black,
+                    0 -6px 0 black,
+                    -6px 0 0 black
+                  `,
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  zIndex: 1,
+                  ...helveticaFont 
+                }}
+              >
                 {cardData.name}
               </h2>
               
               {/* Second render: Clean text overlay */}
-              <h2 style={{ 
-                fontSize: `${92 * scale}px`, 
-                fontWeight: 'bold', 
-                margin: 0, 
-                lineHeight: `${80 * scale}px`, 
-                paddingLeft: cardData.showLeftIcons ? `${0 * scale}px` : `${0 * scale}px`,
-                color: cardData.fullArt ? 'black' : 'white',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                zIndex: 2,
-                ...helveticaFont 
-              }}>
+              <h2 
+                className={`card-name-text card-name-text-${cardData.type}`}
+                style={{ 
+                  fontSize: `${92 * scale}px`, 
+                  fontWeight: 'bold', 
+                  margin: 0, 
+                  lineHeight: `${80 * scale}px`, 
+                  paddingLeft: cardData.showLeftIcons ? `${0 * scale}px` : `${0 * scale}px`,
+                  color: cardData.fullArt ? 'black' : 'white',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  zIndex: 2,
+                  ...helveticaFont 
+                }}
+              >
                 {cardData.name}
               </h2>
             </CardElement>
@@ -1414,7 +1433,7 @@ Examples:
             <CardElement elementType="rightIcon" style={{ paddingRight: 0, position: 'relative' }}>
               {/* OUTERMOST CONTAINER - Main positioning container (220x220px) */}
               <div 
-                className="right-icon-outer-container"
+                className={`right-icon-outer-container right-icon-outer-container-${cardData.type}`}
                 style={{
                   width: `${220 * scale}px`,
                   height: `${220 * scale}px`,
@@ -1540,7 +1559,7 @@ Examples:
 
                 {/* BLACK BORDER RING - Middle ring with black border (200x200px) */}
                 <div 
-                  className="white-border-ring"
+                  className={`white-border-ring white-border-ring-${cardData.type}`}
                                       style={{
                       width: cardData.fullArt ? `${186 * scale}px` : `${280 * scale}px`,
                       height: cardData.fullArt ? `${186 * scale}px` : `${270 * scale}px`,
@@ -1557,32 +1576,43 @@ Examples:
                 >
                   {/* DOMAIN ICON CONTAINER - Inner circle with domain image (120x120px) */}
                   <div 
-                    className="domain-icon-container"
+                    className={`domain-icon-container domain-icon-container-${cardData.type}`}
                     style={{
-                      width: `${120 * scale}px`,
-                      height: `${120 * scale}px`,
-                      borderRadius: '50%',
+                      width: `${156 * scale}px`, // Increased to accommodate the full circle including border
+                      height: `${156 * scale}px`, // Increased to accommodate the full circle including border
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: `${56 * scale}px`,
-                      fontWeight: 'bold',
-                      color: 'white',
-                      backgroundColor: cardColors[cardData.cardColor].bg,
-                      border: `${18 * scale}px solid ` + cardColors[cardData.cardColor].bg,
-                      ...helveticaFont
+                      position: 'relative'
                     }}
                   >
+                    {/* SVG CIRCLE - Drawn circle with proper color */}
+                    <svg 
+                      width={`${156 * scale}px`} 
+                      height={`${156 * scale}px`} 
+                      style={{ position: 'absolute', top: 0, left: 0 }}
+                    >
+                      <circle
+                        cx={`${78 * scale}px`}
+                        cy={`${78 * scale}px`}
+                        r={`${78 * scale}px`}
+                        fill={cardColors[cardData.cardColor].bg}
+                        stroke="none"
+                      />
+                    </svg>
+                    
                     {/* DOMAIN IMAGE - Water/Earth/Smoke/Lightning element image */}
                     <img 
-                      className="domain-image"
+                      className={`domain-image domain-image-${cardData.type}`}
                       src={getDomainImage(cardData.rightIconDomain)}
                       alt={`${cardData.rightIconDomain} Domain`}
                       style={{
-                        width: '170%',
-                        height: '170%',
+                        width: `${204 * scale}px`, // Adjusted size for the new container
+                        height: `${204 * scale}px`, // Adjusted size for the new container
                         objectFit: 'contain',
-                        filter: `sepia(1) hue-rotate(${hexToHue(cardColors[cardData.cardColor].fg) - 115}deg) saturate(13.1)`
+                        filter: `sepia(1) hue-rotate(${hexToHue(cardColors[cardData.cardColor].fg) - 115}deg) saturate(13.1)`,
+                        position: 'relative',
+                        zIndex: 1
                       }}
                     />
                   </div>
@@ -1595,17 +1625,20 @@ Examples:
           {/* End of header container */}
 
           {/* Main Card Area - Art positioning stays consistent */}
-            <div style={{
-              position: 'absolute',
-              top: `${128 * scale}px`,
-              right: 0,
-              bottom: 0,
-              left: 0,
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              zIndex: 1
-            }}>
+            <div 
+              className={`main-card-area main-card-area-${cardData.type}`}
+              style={{
+                position: 'absolute',
+                top: `${128 * scale}px`,
+                right: 0,
+                bottom: 0,
+                left: 0,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                zIndex: 1
+              }}
+            >
             
             {/* Art Box - Main viewing area */}
             <CardElement elementType="background" style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
@@ -1613,7 +1646,7 @@ Examples:
                 <div style={{ position: 'absolute', inset: 0, zIndex: -20, ...artCheckerboardPattern }} />
               )}
               <div 
-                className="card-background-area"
+                className={`card-background-area card-background-area-${cardData.type}`}
                 style={{ 
                   width: '100%', 
                   height: '100%', 
@@ -1628,7 +1661,7 @@ Examples:
 
           {/* Bottom diagonal corners - absolutely positioned independent container */}
           <div 
-            className="card-corner-triangles"
+            className={`card-corner-triangles card-corner-triangles-${cardData.type}`}
             style={{
               position: 'absolute',
               top: 0,
