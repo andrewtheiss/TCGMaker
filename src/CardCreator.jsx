@@ -1636,36 +1636,38 @@ Examples:
               zIndex: 25
             }}
           >
+            {/* Left triangle using CSS borders for better cross-platform compatibility */}
             <div 
-              className="card-triangle-left bottom-border-left" 
+              className="card-triangle-left bottom-border-left"
               style={{
                 position: 'absolute',
-                width: `${150 * scale}px`,
-                height: `${150 * scale}px`,
-                backgroundColor: 'black',
                 bottom: cardData.fullArt ? `${-200 * scale}px` : `${57 * scale}px`,
                 left: cardData.fullArt ? `${-200 * scale}px` : `${55 * scale}px`,
-                clipPath: 'polygon(0 100%, 0 0, 100% 100%)',
+                width: 0,
+                height: 0,
+                borderLeft: `${150 * scale}px solid black`,
+                borderTop: `${150 * scale}px solid transparent`,
                 display: 'block',
                 visibility: 'visible',
                 opacity: 1
-              }} 
+              }}
             />
             
+            {/* Right triangle using CSS borders for better cross-platform compatibility */}
             <div 
-              className="card-triangle-right bottom-border-right" 
+              className="card-triangle-right bottom-border-right"
               style={{
                 position: 'absolute',
-                width: `${150 * scale}px`,
-                height: `${150 * scale}px`,
-                backgroundColor: 'black',
                 bottom: cardData.fullArt ? `${-200 * scale}px` : `${57 * scale}px`,
                 right: cardData.fullArt ? `${-200 * scale}px` : `${55 * scale}px`,
-                clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
+                width: 0,
+                height: 0,
+                borderRight: `${150 * scale}px solid black`,
+                borderTop: `${150 * scale}px solid transparent`,
                 display: 'block',
                 visibility: 'visible',
                 opacity: 1
-              }} 
+              }}
             />
           </div>
           
