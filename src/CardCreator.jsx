@@ -21,6 +21,7 @@ const CardCreator = () => {
     name: 'Card Name',
     cardColor: 'purp',
     type: 'creature',
+    typeDisplayText: 'creature', // Separate field for display text on type line
     subtype: 'Elder Warrior',
     showSubtype: true,
     textBox: 'Card ability text goes here.',
@@ -189,6 +190,9 @@ const CardCreator = () => {
     
     // Set default stat visibility when card type changes
     if (field === 'type') {
+      // Sync the display text when card type changes
+      newData.typeDisplayText = value;
+      
       switch (value) {
         case 'leader':
           newData.showAttack = false;
@@ -414,17 +418,17 @@ const CardCreator = () => {
         {selectedElement === 'type' && (
           <div>
             <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px' }}>
-              Card Type
+              Card Type Text (displayed on type line)
             </label>
-            <select
-              value={cardData.type}
-              onChange={(e) => updateCardData('type', e.target.value)}
-              style={inputStyle}
-            >
-              <option value="creature">Creature</option>
-              <option value="equipment">Equipment</option>
-              <option value="leader">Leader</option>
-            </select>
+            <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>
+              💡 Use the "Card Type" button in the top-left to switch between Creature, Equipment, and Leader layouts
+            </div>
+            <textarea
+              value={cardData.typeDisplayText}
+              onChange={(e) => updateCardData('typeDisplayText', e.target.value)}
+              style={{ ...inputStyle, height: '60px', resize: 'vertical', fontFamily: 'monospace', fontSize: '12px' }}
+              placeholder="Enter custom type text (e.g., 'Artifact', 'Spell', 'Enhancement', etc.)"
+            />
             
             <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px', marginTop: '8px' }}>
               <input
@@ -615,6 +619,29 @@ const CardCreator = () => {
                     const cursorPos = textarea.selectionStart;
                     const textBefore = cardData.textBox.substring(0, cursorPos);
                     const textAfter = cardData.textBox.substring(cursorPos);
+                    updateCardData('textBox', textBefore + '%whenattackingfull%' + textAfter);
+                  }}
+                  style={{
+                    backgroundColor: '#d61f35',
+                    color: 'white',
+                    borderRadius: '0',
+                    padding: '0 8px 0 6px',
+                    fontSize: '8px',
+                    fontWeight: 'bold',
+                    border: 'none',
+                    cursor: 'pointer',
+                    clipPath: 'polygon(4px 0%, 100% 0%, 100% 100%, 4px 100%, 0% 50%)'
+                  }}
+                >
+                  When Attacking
+                </button>
+                
+                <button
+                  onClick={() => {
+                    const textarea = document.querySelector('textarea');
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = cardData.textBox.substring(0, cursorPos);
+                    const textAfter = cardData.textBox.substring(cursorPos);
                     updateCardData('textBox', textBefore + '%tap%' + textAfter);
                   }}
                   style={{
@@ -677,6 +704,28 @@ const CardCreator = () => {
                   }}
                 >
                   On Play
+                </button>
+                
+                <button
+                  onClick={() => {
+                    const textarea = document.querySelector('textarea');
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = cardData.textBox.substring(0, cursorPos);
+                    const textAfter = cardData.textBox.substring(cursorPos);
+                    updateCardData('textBox', textBefore + '%main%' + textAfter);
+                  }}
+                  style={{
+                    backgroundColor: '#ed6429',
+                    color: 'white',
+                    borderRadius: '6px',
+                    padding: '0 6px',
+                    fontSize: '8px',
+                    fontWeight: 'bold',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Main
                 </button>
               </div>
               
@@ -1839,7 +1888,7 @@ Examples:
                 style={{
                   position: 'absolute',
                   left: `${90 * scale}px`,
-                  top: `${1150 * scale}px`,
+                  top: `${(1150 - (cardData.type === 'equipment' ? 250 : 0)) * scale}px`,
                   width: `${132 * scale}px`,
                   height: `${120 * scale}px`,
                   borderRadius: '50%',
@@ -1878,7 +1927,7 @@ Examples:
               style={{
                 position: 'absolute',
                 left: `${95 * scale}px`,
-                top: `${1150 * scale}px`,
+                top: `${(1150 - (cardData.type === 'equipment' ? 250 : 0)) * scale}px`,
                 width: `${128 * scale}px`,
                 height: `${128 * scale}px`,
                 borderRadius: '50%',
@@ -1911,16 +1960,16 @@ Examples:
               position: 'absolute', 
               left: `${cardWidth * 0.05 * scale}px`, 
               right: `${cardWidth * 0.15 * scale}px`, 
-              bottom: cardData.equipmentShowBackground ? `${410 * scale}px` : `${420 * scale}px`, 
+              bottom: cardData.equipmentShowBackground ? `${400 * scale}px` : `${410 * scale}px`, 
               zIndex: 1010
             }}>
               <div style={{
                 position: 'relative',
                 width: `${cardWidth * 0.9 * scale}px`,
-                height: `${119 * scale}px`,
+                height: !cardData.equipmentShowBackground ? `${129 * scale}px` : `${139 * scale}px`,
                 backgroundColor: cardData.equipmentShowBackground ? 'black' : 'transparent',
                 border: cardData.equipmentShowBackground ? `${10 * scale}px solid #555555` : 'none',
-                borderRadius: cardData.equipmentShowBackground ? `${65 * scale}px` : '0',
+                borderRadius: cardData.equipmentShowBackground ? `${75 * scale}px` : '0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'

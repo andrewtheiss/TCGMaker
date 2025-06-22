@@ -52,6 +52,27 @@ export const textFormattingConfig = {
       fontSize: '0.9em',
       fontWeight: 'bold',
       textShadow: 'none'
+    },
+    '%whenattackingfull%': {
+      displayText: 'When Attacking',
+      backgroundColor: '#d61f35',
+      color: 'white',
+      borderRadius: '0',
+      padding: '0 8px 0 5px',
+      fontSize: '0.9em',
+      fontWeight: 'bold',
+      textShadow: 'none',
+      clipPath: 'polygon(0% 0%, calc(100% - 6px) 0%, 100% 50%, calc(100% - 6px) 100%, 0% 100%)'
+    },
+    '%main%': {
+      displayText: 'Main',
+      backgroundColor: '#ed6429',
+      color: 'white',
+      borderRadius: '12px',
+      padding: '0 10px',
+      fontSize: '0.9em',
+      fontWeight: 'bold',
+      textShadow: 'none'
     }
   },
   

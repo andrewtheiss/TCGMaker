@@ -16,7 +16,7 @@ const CardElements = ({
   
   // Define mode-specific styles - all modes are same as classic for now
   // Equipment mode positioning is raised by 50px
-  const equipmentOffset = cardData.type === 'equipment' ? 180 : 0;
+  const equipmentOffset = cardData.type === 'equipment' ? 173 : 0;
   
   const classicStyle = {
     typeLine: {
@@ -97,7 +97,7 @@ const CardElements = ({
               borderRadius: currentMode.typeLine.borderRadius,
               ...helveticaFont
             }}>
-              <span style={{ textTransform: 'capitalize' }}>{cardData.type}</span>
+              <span style={{ textTransform: 'capitalize' }}>{cardData.typeDisplayText || cardData.type}</span>
               {cardData.showSubtype && cardData.subtype && (
                 <>
                   <span style={{ margin: '0 2px' }}>,</span>

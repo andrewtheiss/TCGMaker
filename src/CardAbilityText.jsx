@@ -35,7 +35,7 @@ const CardAbilityText = ({
       const remainingLines = lines.slice(2);
 
       return (
-        <div style={{ margin: '-5px -3px' }}>
+        <div style={{ margin: '-5px 0px' }}>
           {/* First two lines - full width */}
           {firstTwoLines.length > 0 && (
             <div style={{
@@ -65,7 +65,7 @@ const CardAbilityText = ({
     return (
       <p style={{
         ...baseTextStyle,
-        margin: '-5px -3px'
+        margin: '-5px 0px'
       }}>
         {parseFormattedText(cardData.textBox, baseTextStyle)}
       </p>
@@ -80,8 +80,8 @@ const CardAbilityText = ({
         position: 'absolute',
         left: cardData.fullArt ? `${85 * scale}px` : `${85 * scale}px`,
         right: cardData.type === 'creature' || cardData.type === 'equipment' ? `${85 * scale}px` : `${85 * scale}px`,
-        top: `${1326 * scale}px`,
-        bottom: `${180 * scale}px`,
+        top: `${(1326 - (cardData.type === 'equipment' ? 220 : 0)) * scale}px`,
+        bottom: `${(180 + (cardData.type === 'equipment' ? 310 : 0)) * scale}px`,
         backgroundColor: currentMode.textBox.backgroundColor,
         borderRadius: currentMode.textBox.borderRadius,
         padding: currentMode.textBox.padding,
