@@ -12,6 +12,9 @@ import lightningImage from './assets/domain/lightning.png';
 import fireImage from './assets/domain/fire.png';
 import CardElements from './CardElements';
 import LeaderHeader from './LeaderHeader';
+import CardGatePower from './CardGatePower';
+import CardBorder from './CardBorder';
+import CardFooterText from './CardFooterText';
 
 const CardCreator = () => {
   const [cardData, setCardData] = useState({
@@ -1673,221 +1676,23 @@ Examples:
           
 
           
-          {/* Gate Power Overlay - Left Side, Top Layer */}
-          <CardElement elementType="gatePower" style={{
-            position: 'absolute',
-            left: `${22 * scale}px`,
-            top: `${306 * scale}px`,
-            zIndex: 100,
-            opacity: cardData.showGatePower ? 1 : 0,
-            pointerEvents: 'all'
-          }}>
-            <div style={{
-              position: 'relative',
-              width: `${222 * scale}px`,
-              height: `${222 * scale}px`
-            }}>
-              {/* Colored Circle Background */}
-              <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                fontFamily: 'system-ui',
-                transform: 'translate(-50%, calc(-50% - 1px))',
-                width: `${195 * scale}px`,
-                height: `${195 * scale}px`,
-                backgroundColor: cardColors[cardData.cardColor].bg,
-                borderRadius: '50%',
-                WebkitTextStroke: '1px white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: `${75 * scale}px`,
-                zIndex: 1
-              }}>
-                {cardData.gatePower}
-              </div>
-              
-              {/* Gate Power Image */}
-              <img 
-                src={gatePowerImage}
-                alt="Gate Power"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  zIndex: 2
-                }}
-              />
-            </div>
-          </CardElement>
+          {/* Gate Power Component */}
+          <CardGatePower 
+            cardData={cardData}
+            CardElement={CardElement}
+            cardColors={cardColors}
+            scale={scale}
+          />
 
 
 
-          {/* Footer text - positioned relative to card edges */}
-          <div style={{
-            position: 'absolute',
-            left: `${175 * scale}px`,
-            right: `${188 * scale}px`,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            ...helveticaFont,
-            fontSize: `${24 * scale}px`,
-            bottom: `${102 * scale}px`,
-            zIndex: 1000
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: `${4 * scale}px`, marginBottom: '-2px' }}>
-              <CardElement elementType="footerRarity">
-                <div style={{
-                  backgroundColor: 'white',
-                  border: `${5 * scale}px solid black`,
-                  borderRadius: '40%',
-                  padding: `${0 * scale}px ${8 * scale}px`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  lineHeight: '2px',
-                  marginBottom: '0px',
-                  marginLeft: '4px',
-                  justifyContent: 'center',
-                  position: 'relative'
-                }}>
-                  {/* First render: Stroke outline */}
-                  <span style={{
-                    color: 'transparent',
-                    fontWeight: '900',
-                    lineHeight: '8px',
-                    fontSize: `${25 * scale}px`,
-                    WebkitTextStroke: '0.3px black',
-                    position: 'absolute',
-                    zIndex: 1
-                  }}>
-                    {cardData.footerRarity}
-                  </span>
-                  {/* Second render: Clean text */}
-                  <span style={{
-                    color: 'black',
-                    fontWeight: '900',
-                    lineHeight: '8px',
-                    fontSize: `${25 * scale}px`,
-                    position: 'relative',
-                    zIndex: 2
-                  }}>
-                    {cardData.footerRarity}
-                  </span>
-                </div>
-              </CardElement>
-              <CardElement elementType="footerLeft">
-                <div style={{ position: 'relative' }}>
-                  {/* First render: Stroke outline */}
-                  <span style={{
-                    color: 'transparent',
-                    fontWeight: '900',
-                    WebkitTextStroke: '1px white',
-                    position: 'absolute',
-                    zIndex: 1,
-                    ...helveticaFont
-                  }}>
-                    {cardData.footerLeft}
-                  </span>
-                  {/* Second render: Clean text */}
-                  <span style={{
-                    color: 'black',
-                    fontWeight: '900',
-                    position: 'relative',
-                    zIndex: 2,
-                    ...helveticaFont
-                  }}>
-                    {cardData.footerLeft}
-                  </span>
-                </div>
-              </CardElement>
-              <CardElement elementType="footerCenter">
-                <div style={{ position: 'relative' }}>
-                  {/* First render: Stroke outline */}
-                  <span style={{
-                    color: 'transparent',
-                    fontWeight: '900',
-                    fontStyle: 'italic',
-                    WebkitTextStroke: '1px white',
-                    position: 'absolute',
-                    zIndex: 1,
-                    ...helveticaFont
-                  }}>
-                    {cardData.footerCenter}
-                  </span>
-                  {/* Second render: Clean text */}
-                  <span style={{
-                    color: 'black',
-                    fontWeight: '900',
-                    fontStyle: 'italic',
-                    position: 'relative',
-                    zIndex: 2,
-                    ...helveticaFont
-                  }}>
-                    {cardData.footerCenter}
-                  </span>
-                </div>
-              </CardElement>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: `${3 * scale}px` }}>
-              <CardElement elementType="setCode">
-                <div style={{ position: 'relative' }}>
-                  {/* First render: Stroke outline */}
-                  <span style={{
-                    color: 'transparent',
-                    fontWeight: '900',
-                    WebkitTextStroke: '1px white',
-                    position: 'absolute',
-                    zIndex: 1,
-                    ...helveticaFont
-                  }}>
-                    {cardData.setCode}
-                  </span>
-                  {/* Second render: Clean text */}
-                  <span style={{
-                    color: 'black',
-                    fontWeight: '900',
-                    position: 'relative',
-                    zIndex: 2,
-                    ...helveticaFont
-                  }}>
-                    {cardData.setCode}
-                  </span>
-                </div>
-              </CardElement>
-              <CardElement elementType="cardNumber">
-                <div style={{ position: 'relative' }}>
-                  {/* First render: Stroke outline */}
-                  <span style={{
-                    color: 'transparent',
-                    fontWeight: '900',
-                    WebkitTextStroke: '1px white',
-                    position: 'absolute',
-                    zIndex: 1,
-                    ...helveticaFont
-                  }}>
-                    #{cardData.cardNumber}
-                  </span>
-                  {/* Second render: Clean text */}
-                  <span style={{
-                    color: 'black',
-                    fontWeight: '900',
-                    position: 'relative',
-                    zIndex: 2,
-                    ...helveticaFont
-                  }}>
-                    #{cardData.cardNumber}
-                  </span>
-                </div>
-              </CardElement>
-            </div>
-          </div>
+          {/* Footer Text Component */}
+          <CardFooterText 
+            cardData={cardData}
+            CardElement={CardElement}
+            helveticaFont={helveticaFont}
+            scale={scale}
+          />
 
           {/* Bean Image - Bottom Left Corner */}
           <div style={{
@@ -2010,47 +1815,12 @@ Examples:
             />
           )}
 
-          {/* Card Border - positioned absolutely to the outer edge */}
-          {!cardData.fullArt && (
-            <div 
-              className="card-border-frame"
-              style={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                bottom: 0,
-                left: 0,
-                backgroundColor: 'transparent',
-                borderTop: `${56 * scale}px solid black`,
-                borderLeft: `${56 * scale}px solid black`,
-                borderRight: `${56 * scale}px solid black`,
-                borderBottom: `${51 * scale}px solid black`,
-                borderRadius: `${64 * scale}px`,
-                zIndex: 10,
-                pointerEvents: 'none'
-              }} 
-            />
-          )}
-
-          {/* Additional Bottom Border - only when full-art is OFF */}
-          {!cardData.fullArt && (
-            <CardElement elementType="bottomBorder">
-              <div 
-                className="card-bottom-border-extended"
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: `${92 * scale}px`,
-                  backgroundColor: 'black',
-                  borderRadius: `0 0 ${64 * scale}px ${64 * scale}px`,
-                  zIndex: 15,
-                  pointerEvents: 'auto'
-                }} 
-              />
-            </CardElement>
-          )}
+          {/* Card Border Component */}
+          <CardBorder 
+            cardData={cardData}
+            CardElement={CardElement}
+            scale={scale}
+          />
 
           {/* CardElements component - handles type line, horizontal bar, text box, and stats */}
           <CardElements 
