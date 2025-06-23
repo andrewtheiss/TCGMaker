@@ -31,48 +31,50 @@ const CardAbilityText = ({
     // For classic mode, we need different line widths
     if (currentMode && currentMode.typeLine && cardData.textBox) {
       const lines = cardData.textBox.split('\n');
-      const firstTwoLines = lines.slice(0, 2);
-      const remainingLines = lines.slice(2);
+      
+      // Filter out empty lines but keep track of their positions for spacing
+      const processedLines = lines.map((line, index) => ({
+        content: line,
+        isEmpty: line.trim() === '',
+        isFirstTwo: index < 2
+      }));
 
       return (
         <div style={{ margin: '-5px 0px' }}>
-          {/* First two lines - full width */}
-          {firstTwoLines.length > 0 && (
-            <div style={{
+          {processedLines.map((lineData, index) => {
+            // Handle empty lines as spacing
+            if (lineData.isEmpty) {
+              return <div key={index} style={{ height: `${35 * scale}px` }}></div>;
+            }
+
+            // Determine width based on line position
+            const containerStyle = {
               width: '100%',
+              marginRight: lineData.isFirstTwo ? '0' : '20%',
               textAlign: 'justify',
               ...baseTextStyle
-            }}>
-              {parseFormattedText(firstTwoLines.join('\n'), baseTextStyle)}
-            </div>
-          )}
-          
-          {/* Remaining lines - 80% width (20% margin from right) */}
-          {remainingLines.length > 0 && (
-            <div style={{
-              width: '80%',
-              textAlign: 'justify',
-              ...baseTextStyle
-            }}>
-              {parseFormattedText(remainingLines.join('\n'), baseTextStyle)}
-            </div>
-          )}
+            };
+
+            return (
+              <div key={index} style={containerStyle}>
+                {parseFormattedText(lineData.content, baseTextStyle)}
+              </div>
+            );
+          })}
         </div>
       );
     }
 
-    // Fallback to original rendering for non-classic modes or when no special handling needed
+    // Fallback to original rendering for non-classic modes
     return (
-      <p style={{
+      <div style={{
         ...baseTextStyle,
         margin: '-5px 0px'
       }}>
         {parseFormattedText(cardData.textBox, baseTextStyle)}
-      </p>
+      </div>
     );
   };
-
-
 
   return (
     <CardElement elementType="abilityText">

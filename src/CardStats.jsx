@@ -82,8 +82,8 @@ const CardStats = ({ cardData, CardElement, currentMode, scale, helveticaFont })
                       <span style={{ 
                         transform: 'rotate(-45deg)',
                         // Better centering for +/- text
-                        marginTop: attackHasModifier ? `${10 * scale}px` : '0',
-                        marginLeft: attackHasModifier ? `${-30 * scale}px` : '0',
+                        marginTop: attackHasModifier ? `${10 * scale}px` : '-2px',
+                        marginLeft: attackHasModifier ? `${-30 * scale}px` : '-1px',
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'center',
@@ -155,11 +155,15 @@ const CardStats = ({ cardData, CardElement, currentMode, scale, helveticaFont })
                       justifyContent: 'center',
                       fontWeight: 'bold',
                       borderRadius: currentMode.statsDiamonds.borderRadius,
-                      WebkitTextStroke: '0.5px black',
+                      WebkitTextStroke: '1px black',
                       fontSize: `${100 * scale}px`,
                       ...helveticaFont
                     }}>
-                      <span style={{ transform: 'rotate(-45deg)' }}>
+                      <span style={{ 
+                        transform: 'rotate(-45deg)',
+                         marginLeft: '-3px',
+                         marginTop: '-2px'
+                         }}>
                         {cardData.defense}
                       </span>
                     </div>

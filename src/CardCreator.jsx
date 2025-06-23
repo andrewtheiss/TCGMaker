@@ -5,6 +5,7 @@ import cardogImage from './assets/jade.png';
 import gatePowerImage from './assets/gatepower.png';
 import izkWhiteImage from './assets/ikz_white.png';
 import ikzBgImage from './assets/ikzbg.png';
+import ikzBackImage from './assets/ikzback.png';
 import waterImage from './assets/domain/water.png';
 import earthImage from './assets/domain/earth.png';
 import smokeImage from './assets/domain/smoke.png';
@@ -259,31 +260,55 @@ const CardCreator = () => {
   const CardBack = () => (
     <div style={{
       position: 'relative',
-      backgroundColor: 'black',
+      backgroundColor: '#34404e',
       borderRadius: `${64 * scale}px`,
       overflow: 'hidden',
       width: `${cardWidth * scale}px`,
       height: `${cardHeight * scale}px`,
-      border: `${8 * scale}px solid black`,
       boxSizing: 'border-box'
     }}>
-      {/* Background image taking up most of the card */}
+      {/* Standard black border like front card */}
       <div style={{
         position: 'absolute',
-        top: `${16 * scale}px`,
-        left: `${16 * scale}px`,
-        right: `${16 * scale}px`,
-        bottom: `${16 * scale}px`,
+        top: `${55 * scale}px`,
+        left: `${55 * scale}px`,
+        right: `${55 * scale}px`,
+        bottom: `${55 * scale}px`,
+        border: `${8 * scale}px solid black`,
         borderRadius: `${48 * scale}px`,
-        overflow: 'hidden'
+        zIndex: 1
+      }} />
+      
+      {/* Background area with specified color */}
+      <div style={{
+        position: 'absolute',
+        top: `${63 * scale}px`,
+        left: `${63 * scale}px`,
+        right: `${63 * scale}px`,
+        bottom: `${63 * scale}px`,
+        backgroundColor: '#34404e',
+        borderRadius: `${40 * scale}px`,
+        zIndex: 20
+      }} />
+      
+      {/* Center image */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 3,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}>
         <img 
-          src={ikzBgImage} 
-          alt="Card back" 
+          src={ikzBackImage} 
+          alt="Card back center" 
           style={{ 
-            width: '100%', 
-            height: '100%', 
-            objectFit: 'cover'
+            maxWidth: `${(cardWidth * 0.6) * scale}px`,
+            maxHeight: `${(cardHeight * 0.6) * scale}px`,
+            objectFit: 'contain'
           }}
         />
       </div>
@@ -1564,12 +1589,13 @@ Examples:
                     style={{
                       width: `${120 * scale}px`,
                       height: `${140 * scale}px`,
+                      paddingTop: '2px',
                       borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'left',
                       justifyContent: 'left',
                       fontSize: `${105 * scale}px`,
-                      lineHeight: `${145 * scale}px`,
+                      lineHeight: `${120 * scale}px`,
                       fontWeight: 'bold',
                       color: 'white',
                       position: 'relative',
@@ -1664,7 +1690,7 @@ Examples:
               >
                 
                                   {/* CIRCULAR TEXT AREA - Text that curves around the outer perimeter */}
-                  <CardElement elementType="circularText" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+                  <CardElement elementType="circularText" style={{ position: 'absolute', top: -7, left: 2, width: '100%', height: '100%' }}>
                     {/* CIRCULAR TEXT STROKE LEFT - First render with black stroke outline (counter-clockwise) */}
                     <svg 
                       className="circular-text-stroke-svg"
@@ -1676,8 +1702,8 @@ Examples:
                                               <path 
                         id="circle-path-stroke" 
                         d={cardData.flipCircularText 
-                          ? `M ${109.99 * scale} ${20 * scale} A ${105 * scale} ${105 * scale} 0 1 0 ${110 * scale} ${20 * scale}`
-                          : `M ${110 * scale} ${20 * scale} A ${105 * scale} ${105 * scale} 0 1 1 ${109.99 * scale} ${20 * scale}`
+                          ? `M ${109.99 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 0 ${110 * scale} ${20 * scale}`
+                          : `M ${110 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 1 ${109.99 * scale} ${20 * scale}`
                         }
                       />
                       </defs>
@@ -1713,8 +1739,8 @@ Examples:
                                               <path 
                         id="circle-path-stroke-right" 
                         d={cardData.flipCircularText 
-                          ? `M ${109.99 * scale} ${20 * scale} A ${110 * scale} ${105 * scale} 0 1 0 ${110 * scale} ${20 * scale}`
-                          : `M ${110 * scale} ${20 * scale} A ${105 * scale} ${105 * scale} 0 1 1 ${109.99 * scale} ${20 * scale}`
+                          ? `M ${109.99 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 0 ${110 * scale} ${20 * scale}`
+                          : `M ${110 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 1 ${109.99 * scale} ${20 * scale}`
                         }
                       />
                       </defs>
@@ -1751,8 +1777,8 @@ Examples:
                                               <path 
                         id="circle-path-fill" 
                         d={cardData.flipCircularText 
-                          ? `M ${109.99 * scale} ${20 * scale} A ${105 * scale} ${105 * scale} 0 1 0 ${110 * scale} ${20 * scale}`
-                          : `M ${110 * scale} ${20 * scale} A ${105 * scale} ${105 * scale} 0 1 1 ${109.99 * scale} ${20 * scale}`
+                          ? `M ${107.99 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 0 ${108 * scale} ${20 * scale}`
+                          : `M ${108 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 1 ${107.99 * scale} ${20 * scale}`
                         }
                       />
                       </defs>
@@ -2077,14 +2103,14 @@ Examples:
           {cardData.type === 'equipment' && (
             <CardElement elementType="cardName" style={{ 
               position: 'absolute', 
-              left: `${cardWidth * 0.04 * scale}px`, 
-              right: `${cardWidth * 0.04 * scale}px`, 
+              left: `${cardWidth * 0.05 * scale}px`, 
+              right: `${cardWidth * 0.05 * scale}px`, 
               bottom: cardData.equipmentShowBackground ? `${390 * scale}px` : `${410 * scale}px`, 
               zIndex: 1010
             }}>
               <div style={{
                 position: 'relative',
-                width: `${cardWidth * 0.9 * scale}px`,
+                width: '100%',
                 height: !cardData.equipmentShowBackground ? `${149 * scale}px` : `${169 * scale}px`,
                 // First background layer - gradient from inside to outside
                 background: cardData.equipmentShowBackground ? 'radial-gradient(ellipse at center, #eaf3fe 30%, #68717a 100%)' : 'transparent',

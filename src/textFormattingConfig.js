@@ -23,7 +23,8 @@ export const textFormattingConfig = {
       fontSize: '0.9em',
       fontWeight: 'bold',
       textShadow: 'none',
-      clipPath: 'polygon(0% 0%, calc(100% - 6px) 0%, 100% 50%, calc(100% - 6px) 100%, 0% 100%)'
+      isTriangle: true,
+      triangleType: 'right' // triangle pointing right
     },
     '%tap%': {
       displayText: ':',
@@ -41,7 +42,8 @@ export const textFormattingConfig = {
       fontSize: '0.9em',
       fontWeight: 'bold',
       textShadow: 'none',
-      clipPath: 'polygon(6px 0%, calc(100% - 6px) 0%, 100% 50%, calc(100% - 6px) 100%, 6px 100%, 0% 50%)'
+      isTriangle: true,
+      triangleType: 'diamond' // diamond shape
     },
     '%onplay%': {
       displayText: 'On Play',
@@ -62,7 +64,8 @@ export const textFormattingConfig = {
       fontSize: '0.9em',
       fontWeight: 'bold',
       textShadow: 'none',
-      clipPath: 'polygon(0% 0%, calc(100% - 6px) 0%, 100% 50%, calc(100% - 6px) 100%, 0% 100%)'
+      isTriangle: true,
+      triangleType: 'right' // triangle pointing right
     },
     '%main%': {
       displayText: 'Main',

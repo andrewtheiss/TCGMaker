@@ -22,7 +22,7 @@ const CardElements = ({
     typeLine: {
       height: '17px',
       bottom: `${(148 + equipmentOffset) * scale}px`,
-      fontSize: '12px',
+      fontSize: '12.5px',
       lineHeight: '12.5px',
       borderRadius: '0px'
     },
@@ -81,12 +81,12 @@ const CardElements = ({
           {/* Main type bar */}
           <CardElement elementType="type" style={{ height: '100%' }}>
             <div style={{
-              height: '100%',
-              padding: '0px 16px',
+              height: '88%',
+              padding: '0px 16px 2px 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: currentMode.typeLine.fontSize,
+              fontSize: '12px',
               fontWeight: '600',
               textAlign: 'center',
               whiteSpace: 'nowrap',
@@ -95,6 +95,7 @@ const CardElements = ({
               lineHeight: currentMode.typeLine.height,
               minWidth: '100px',
               margin: '0px -1px 0px -1px',
+              lineHeight: '18px',
               borderRadius: currentMode.typeLine.borderRadius,
               ...helveticaFont
             }}>

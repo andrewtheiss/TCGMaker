@@ -29,7 +29,7 @@ const CardGatePower = ({ cardData, CardElement, cardColors, scale }) => {
             height: `${195 * scale}px`,
             backgroundColor: cardColors[cardData.cardColor].bg,
             borderRadius: '50%',
-            WebkitTextStroke: '1px white',
+            WebkitTextStroke: '0.5px white',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -38,7 +38,25 @@ const CardGatePower = ({ cardData, CardElement, cardColors, scale }) => {
             fontSize: `${75 * scale}px`,
             zIndex: 1
           }}>
-            {cardData.gatePower}
+            <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            fontFamily: 'system-ui',
+            transform: 'translate(-50%, calc(-50% - 1px))',
+            width: `${195 * scale}px`,
+            height: `${195 * scale}px`,
+            borderRadius: '50%',
+            WebkitTextStroke: '0.5px white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: `${75 * scale}px`,
+            zIndex: 1
+          }}>{cardData.gatePower}</div>
+            
           </div>
           
           {/* Gate Power Image */}
