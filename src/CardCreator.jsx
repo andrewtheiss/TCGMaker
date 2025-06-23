@@ -17,6 +17,8 @@ import CardGatePower from './CardGatePower';
 import CardBorder from './CardBorder';
 import CardFooterText from './CardFooterText';
 
+// Note: ColoredImage component removed - now using pre-generated colored images directly
+
 const CardCreator = () => {
   const [cardData, setCardData] = useState({
     name: 'Card Name',
@@ -76,67 +78,137 @@ const CardCreator = () => {
   const cardHeight = 2100;
   const scale = 0.25; // Scale down for display (375px x 525px)
 
-  // Helper function to calculate CSS filter values for WHITE images to achieve target colors
-  const getWhiteImageFilter = (targetHex) => {
-    // Convert hex to RGB
-    const r = parseInt(targetHex.slice(1, 3), 16);
-    const g = parseInt(targetHex.slice(3, 5), 16);
-    const b = parseInt(targetHex.slice(5, 7), 16);
+  // Convert hex color to RGB object
+  const hexToRgb = (hex) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  };
+
+  // Generate colored version of white/light images using canvas
+  const generateColoredImage = (originalImageSrc, targetColor) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        // Draw the original image
+        ctx.drawImage(img, 0, 0);
+        
+        // Apply color transformation
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        const targetRgb = hexToRgb(targetColor);
+        
+        for (let i = 0; i < data.length; i += 4) {
+          // Only process white/light pixels (threshold > 200)
+          if (data[i] > 200 && data[i + 1] > 200 && data[i + 2] > 200) {
+            // Replace with target color, maintaining alpha
+            data[i] = targetRgb.r;     // Red
+            data[i + 1] = targetRgb.g; // Green
+            data[i + 2] = targetRgb.b; // Blue
+            // Alpha stays the same (data[i + 3])
+          }
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      
+      img.crossOrigin = 'anonymous';
+      img.src = originalImageSrc;
+    });
+  };
+
+  // Helper function to delay downloads
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // Get pre-generated colored image path (all images are flat in /src/assets/)
+  const getColoredImagePath = (baseImageName, cardColor, domain = null) => {
+    // Map card colors to file naming convention
+    const colorMap = {
+      'purp': 'purple',
+      'yellow': 'yellow', 
+      'smoke': 'smoke',
+      'blue': 'blue',
+      'fire': 'fire'
+    };
     
-    // Convert RGB to HSL for hue calculation
-    const rNorm = r / 255;
-    const gNorm = g / 255;
-    const bNorm = b / 255;
+    const colorName = colorMap[cardColor] || 'purple';
     
-    const max = Math.max(rNorm, gNorm, bNorm);
-    const min = Math.min(rNorm, gNorm, bNorm);
-    const diff = max - min;
-    
-    let h = 0;
-    if (diff !== 0) {
-      switch (max) {
-        case rNorm: h = ((gNorm - bNorm) / diff) + (gNorm < bNorm ? 6 : 0); break;
-        case gNorm: h = ((bNorm - rNorm) / diff) + 2; break;
-        case bNorm: h = ((rNorm - gNorm) / diff) + 4; break;
+    // Handle domain images (flat in /src/assets/)
+    if (domain) {
+      try {
+        // Import colored domain image: /src/assets/water_purple.png, etc.
+        return new URL(`./assets/${domain}_${colorName}.png`, import.meta.url).href;
+      } catch (error) {
+        console.warn(`Colored domain image not found: ${domain}_${colorName}.png, falling back to original`);
+        return getDomainImage(domain);
       }
-      h /= 6;
     }
     
-    const targetHue = Math.round(h * 360);
-    const saturation = Math.round(((max - min) / (max + min)) * 10000);
-    const brightness = Math.round((max + min) / 2 * 200);
-    
-    // For white images: brightness(0) -> invert(100%) -> sepia(100%) -> saturate() -> hue-rotate() -> brightness() -> contrast()
-    return `brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(${Math.max(1000, saturation)}%) hue-rotate(${targetHue}deg) brightness(${Math.max(80, brightness)}%) contrast(100%)`;
-  };
-
-  // Pre-calculated optimized filters for WHITE images to your specific color palette  
-  const whiteImageFilters = {
-    '#dc8fc7': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(2000%) hue-rotate(287deg) brightness(110%) contrast(100%)', // Purple fg
-    '#6c449a': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(3000%) hue-rotate(260deg) brightness(80%) contrast(120%)',  // Purple bg
-    '#ffbf2e': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(4000%) hue-rotate(-50deg) brightness(120%) contrast(100%)',  // Yellow fg
-    '#ca722b': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(2500%) hue-rotate(15deg) brightness(90%) contrast(110%)',   // Yellow bg
-    '#cec5c0': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(200%) hue-rotate(20deg) brightness(105%) contrast(90%)',   // Smoke fg
-    '#686463': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(500%) hue-rotate(20deg) brightness(70%) contrast(100%)',    // Smoke bg
-    '#75d0e2': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(2500%) hue-rotate(160deg) brightness(115%) contrast(100%)', // Blue fg - your target color
-    '#5289c9': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(2000%) hue-rotate(180deg) brightness(90%) contrast(110%)',  // Blue bg
-    '#ff4026': 'brightness(0) saturate(100%) invert(100%) sepia(69%) saturate(3000%) hue-rotate(-57deg) brightness(110%) contrast(100%)', // Fire fg
-    '#c4353d': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(3000%) hue-rotate(340deg) brightness(85%) contrast(120%)'   // Fire bg
-  };
-
-  // Function to get the optimized filter for WHITE images
-  const getOptimizedFilter = (hex) => {
-    // Normalize the hex value (ensure it starts with # and is lowercase)
-    const normalizedHex = hex.toLowerCase().startsWith('#') ? hex.toLowerCase() : `#${hex.toLowerCase()}`;
-    
-    // Try exact match first
-    const exactMatch = whiteImageFilters[normalizedHex];
-    if (exactMatch) {
-      return exactMatch;
+    // Handle IKZ white image (flat in /src/assets/)
+    if (baseImageName === 'ikz_white') {
+      try {
+        // Import colored IKZ image: /src/assets/ikz_white_purple.png, etc.
+        return new URL(`./assets/ikz_white_${colorName}.png`, import.meta.url).href;
+      } catch (error) {
+        console.warn(`Colored IKZ image not found: ikz_white_${colorName}.png, falling back to original`);
+        return izkWhiteImage;
+      }
     }
     
-    // Fallback to calculated filter
-    return getWhiteImageFilter(normalizedHex);
+    return baseImageName;
+  };
+
+  // Regenerate fire-colored images with updated color
+  const regenerateFireAssets = async () => {
+    const fireColor = '#ff9c61'; // Updated fire color: rgb(255, 156, 97)
+    const domains = ['water', 'earth', 'smoke', 'lightning', 'fire'];
+    let downloadCount = 0;
+    const totalFiles = 1 + domains.length; // IKZ + 5 domains = 6 files
+    
+    try {
+      alert(`🔥 Regenerating fire-colored assets with updated color!\n\nNew fire color: rgb(255, 156, 97) = #ff9c61\n\nDownloading ${totalFiles} files...`);
+      
+      // Generate updated IKZ fire variant
+      const coloredIkzImage = await generateColoredImage(izkWhiteImage, fireColor);
+      const ikzLink = document.createElement('a');
+      ikzLink.download = `ikz_white_fire.png`;
+      ikzLink.href = coloredIkzImage;
+      ikzLink.click();
+      
+      downloadCount++;
+      console.log(`Generated ${downloadCount}/${totalFiles}: ikz_white_fire.png`);
+      await delay(500);
+      
+      // Generate updated domain fire variants
+      for (const domain of domains) {
+        const domainImage = getDomainImage(domain);
+        const coloredDomainImage = await generateColoredImage(domainImage, fireColor);
+        
+        const domainLink = document.createElement('a');
+        domainLink.download = `${domain}_fire.png`;
+        domainLink.href = coloredDomainImage;
+        domainLink.click();
+        
+        downloadCount++;
+        console.log(`Generated ${downloadCount}/${totalFiles}: ${domain}_fire.png`);
+        await delay(500);
+      }
+      
+      alert(`🔥 All ${totalFiles} fire-colored images regenerated!\n\nReplace the old fire assets in /src/assets/ with these new ones.\nThe fire color is now darker and more vibrant!`);
+    } catch (error) {
+      console.error('Error regenerating fire assets:', error);
+      alert('Error regenerating fire images. Please try again.');
+    }
   };
 
   // Helper function to get domain image
@@ -165,7 +237,7 @@ const CardCreator = () => {
     yellow: { bg: '#ca722b', fg: '#ffbf2e' },
     smoke: { bg: '#686463', fg: '#cec5c0' },
     blue: { bg: '#5289c9', fg: '#75d0e2' },
-    fire: { bg: '#c4353d', fg: '#ff4026' }
+    fire: { bg: '#c4353d', fg: '#ff9c61' }
   };
 
   const rarityColors = {
@@ -1573,14 +1645,13 @@ Examples:
                     }}
                   >
                    <img 
-                     src={izkWhiteImage}
+                     src={getColoredImagePath('ikz_white', cardData.cardColor)}
                      alt="IZK"
                      className={`card-color-icon card-color-icon-${cardData.type}`}
                      style={{
                        width: '92%',
                        height: '92%',
-                       objectFit: 'contain',
-                       filter: getOptimizedFilter(cardColors[cardData.cardColor].fg)
+                       objectFit: 'contain'
                      }}
                    />
 
@@ -1637,14 +1708,14 @@ Examples:
                     WebkitTextStroke: cardData.fullArt ? '6px white' : 'none',
                     color: cardData.fullArt ? 'transparent' : 'white',
                     textShadow: cardData.fullArt ? 'none' : `
-                      -6px -6px 0 black,
-                      6px -6px 0 black,
-                      -6px 6px 0 black,
-                      6px 6px 0 black,
-                      0 6px 0 black,
-                      6px 0 0 black,
-                      0 -6px 0 black,
-                      -6px 0 0 black
+                      -2px -2px 0 black,
+                      2px -2px 0 black,
+                      -2px 2px 0 black,
+                      2px 2px 0 black,
+                      0 2px 0 black,
+                      2px 0 0 black,
+                      0 -2px 0 black,
+                      -2px 0 0 black
                     `,
                     position: 'absolute',
                     top: 0,
@@ -1855,13 +1926,12 @@ Examples:
                     {/* DOMAIN IMAGE - Water/Earth/Smoke/Lightning element image */}
                     <img 
                       className={`domain-image domain-image-${cardData.type}`}
-                      src={getDomainImage(cardData.rightIconDomain)}
+                      src={getColoredImagePath('domain', cardData.cardColor, cardData.rightIconDomain)}
                       alt={`${cardData.rightIconDomain} Domain`}
                       style={{
                         width: `${204 * scale}px`, // Adjusted size for the new container
                         height: `${204 * scale}px`, // Adjusted size for the new container
                         objectFit: 'contain',
-                        filter: getOptimizedFilter(cardColors[cardData.cardColor].fg),
                         position: 'relative',
                         zIndex: 1
                       }}
@@ -2364,6 +2434,22 @@ Examples:
           }}
         >
           🃏 Card Type: {cardData.type === 'creature' ? 'Classic' : cardData.type === 'equipment' ? 'Equipment' : 'Leader'}
+        </button>
+        
+        <button
+          onClick={regenerateFireAssets}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#dc2626',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '500'
+          }}
+        >
+          🔥 Regen Fire Assets
         </button>
         
         {cardData.overlayImage && (
