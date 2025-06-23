@@ -206,6 +206,8 @@ const CardCreator = () => {
           logging: false,
           useCORS: true,
           allowTaint: true,
+          removeContainer: true,
+          imageTimeout: 0,
           ignoreElements: (element) => {
             // Ignore edit panel and overlay elements
             return element.classList.contains('edit-panel') || 
@@ -218,7 +220,7 @@ const CardCreator = () => {
           ? `${cardData.name.replace(/\s+/g, '_')}_card_back.png`
           : `${cardData.name.replace(/\s+/g, '_')}_card.png`;
         link.download = fileName;
-        link.href = canvas.toDataURL('image/png');
+        link.href = canvas.toDataURL('image/png', 1.0);
         link.click();
       } catch (error) {
         console.error('Error downloading card:', error);
@@ -1438,7 +1440,12 @@ Examples:
               <img 
                 src={cardData.backgroundImage} 
                 alt="Card background" 
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'cover',
+                  objectPosition: 'center center'
+                }}
                 className={`card-background card-background-${cardData.type}`}
               />
             ) : (
