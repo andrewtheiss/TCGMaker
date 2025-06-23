@@ -16,18 +16,18 @@ const CardFooterText = ({ cardData, CardElement, helveticaFont, scale }) => {
         bottom: `${102 * scale}px`,
         zIndex: 1000
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: `${4 * scale}px`, marginBottom: '-2px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: `${4 * scale}px`, marginBottom: '0px' }}>
           <CardElement elementType="footerRarity">
             <div style={{
               backgroundColor: 'white',
               border: `${5 * scale}px solid black`,
-              borderRadius: '40%',
-              padding: `${0 * scale}px ${8 * scale}px`,
+              borderRadius: '35%',
+              padding: `${0 * scale}px ${6 * scale}px ${0 * scale}px ${6 * scale}px`,
               display: 'flex',
               alignItems: 'center',
-              lineHeight: '2px',
-              marginBottom: '0px',
-              marginLeft: '4px',
+              lineHeight: '0px',
+              marginBottom: '-2px',
+              marginLeft: '3px',
               justifyContent: 'center',
               position: 'relative'
             }}>
@@ -35,11 +35,12 @@ const CardFooterText = ({ cardData, CardElement, helveticaFont, scale }) => {
               <span style={{
                 color: 'transparent',
                 fontWeight: '900',
-                lineHeight: '8px',
+                lineHeight: '4px',
                 fontSize: `${25 * scale}px`,
                 WebkitTextStroke: '0.3px black',
                 position: 'absolute',
-                zIndex: 1
+                zIndex: 1,
+                marginTop: '-2px'
               }}>
                 {cardData.footerRarity}
               </span>
@@ -50,6 +51,7 @@ const CardFooterText = ({ cardData, CardElement, helveticaFont, scale }) => {
                 lineHeight: '8px',
                 fontSize: `${25 * scale}px`,
                 position: 'relative',
+                marginTop: '-2px',
                 zIndex: 2
               }}>
                 {cardData.footerRarity}
