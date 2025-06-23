@@ -56,7 +56,9 @@ const CardCreator = () => {
     leaderDescription1: 'Primary Title',
     leaderDescription2: 'Secondary Description',
     // Equipment-specific fields
-    equipmentShowBackground: true
+    equipmentShowBackground: true,
+    equipmentDescription: 'Equipment description text goes here.  There should be two lines of text for it to render properly!',
+    equipmentDescriptionStyle: 'diamond' // 'diamond' or 'rounded'
   });
 
   const [selectedElement, setSelectedElement] = useState(null);
@@ -73,26 +75,67 @@ const CardCreator = () => {
   const cardHeight = 2100;
   const scale = 0.25; // Scale down for display (375px x 525px)
 
-  // Helper function to convert hex color to hue for CSS filter
-  const hexToHue = (hex) => {
-    const r = parseInt(hex.slice(1, 3), 16) / 255;
-    const g = parseInt(hex.slice(3, 5), 16) / 255;
-    const b = parseInt(hex.slice(5, 7), 16) / 255;
+  // Helper function to calculate CSS filter values for WHITE images to achieve target colors
+  const getWhiteImageFilter = (targetHex) => {
+    // Convert hex to RGB
+    const r = parseInt(targetHex.slice(1, 3), 16);
+    const g = parseInt(targetHex.slice(3, 5), 16);
+    const b = parseInt(targetHex.slice(5, 7), 16);
     
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
+    // Convert RGB to HSL for hue calculation
+    const rNorm = r / 255;
+    const gNorm = g / 255;
+    const bNorm = b / 255;
+    
+    const max = Math.max(rNorm, gNorm, bNorm);
+    const min = Math.min(rNorm, gNorm, bNorm);
+    const diff = max - min;
+    
     let h = 0;
-    
-    if (max !== min) {
-      const delta = max - min;
+    if (diff !== 0) {
       switch (max) {
-        case r: h = ((g - b) / delta + (g < b ? 6 : 0)) / 6; break;
-        case g: h = ((b - r) / delta + 2) / 6; break;
-        case b: h = ((r - g) / delta + 4) / 6; break;
+        case rNorm: h = ((gNorm - bNorm) / diff) + (gNorm < bNorm ? 6 : 0); break;
+        case gNorm: h = ((bNorm - rNorm) / diff) + 2; break;
+        case bNorm: h = ((rNorm - gNorm) / diff) + 4; break;
       }
+      h /= 6;
     }
     
-    return Math.round(h * 360);
+    const targetHue = Math.round(h * 360);
+    const saturation = Math.round(((max - min) / (max + min)) * 10000);
+    const brightness = Math.round((max + min) / 2 * 200);
+    
+    // For white images: brightness(0) -> invert(100%) -> sepia(100%) -> saturate() -> hue-rotate() -> brightness() -> contrast()
+    return `brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(${Math.max(1000, saturation)}%) hue-rotate(${targetHue}deg) brightness(${Math.max(80, brightness)}%) contrast(100%)`;
+  };
+
+  // Pre-calculated optimized filters for WHITE images to your specific color palette  
+  const whiteImageFilters = {
+    '#dc8fc7': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(2000%) hue-rotate(287deg) brightness(110%) contrast(100%)', // Purple fg
+    '#6c449a': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(3000%) hue-rotate(260deg) brightness(80%) contrast(120%)',  // Purple bg
+    '#ffbf2e': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(4000%) hue-rotate(-50deg) brightness(120%) contrast(100%)',  // Yellow fg
+    '#ca722b': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(2500%) hue-rotate(15deg) brightness(90%) contrast(110%)',   // Yellow bg
+    '#cec5c0': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(200%) hue-rotate(20deg) brightness(105%) contrast(90%)',   // Smoke fg
+    '#686463': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(500%) hue-rotate(20deg) brightness(70%) contrast(100%)',    // Smoke bg
+    '#75d0e2': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(2500%) hue-rotate(160deg) brightness(115%) contrast(100%)', // Blue fg - your target color
+    '#5289c9': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(2000%) hue-rotate(180deg) brightness(90%) contrast(110%)',  // Blue bg
+    '#ff4026': 'brightness(0) saturate(100%) invert(100%) sepia(69%) saturate(3000%) hue-rotate(-57deg) brightness(110%) contrast(100%)', // Fire fg
+    '#c4353d': 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(3000%) hue-rotate(340deg) brightness(85%) contrast(120%)'   // Fire bg
+  };
+
+  // Function to get the optimized filter for WHITE images
+  const getOptimizedFilter = (hex) => {
+    // Normalize the hex value (ensure it starts with # and is lowercase)
+    const normalizedHex = hex.toLowerCase().startsWith('#') ? hex.toLowerCase() : `#${hex.toLowerCase()}`;
+    
+    // Try exact match first
+    const exactMatch = whiteImageFilters[normalizedHex];
+    if (exactMatch) {
+      return exactMatch;
+    }
+    
+    // Fallback to calculated filter
+    return getWhiteImageFilter(normalizedHex);
   };
 
   // Helper function to get domain image
@@ -157,9 +200,7 @@ const CardCreator = () => {
     if (cardRef.current) {
       try {
         const canvas = await html2canvas(cardRef.current, {
-          width: cardWidth,
-          height: cardHeight,
-          scale: 4, // High resolution multiplier
+          scale: 4, // High resolution multiplier - this will scale the actual rendered size
           backgroundColor: null,
           logging: false,
           useCORS: true,
@@ -337,6 +378,19 @@ const CardCreator = () => {
                 <div style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
                   Toggle the black background and border for the equipment name bar
                 </div>
+                
+                <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px', marginTop: '16px' }}>
+                  Equipment Description (Black Background, Italics)
+                </label>
+                <textarea
+                  value={cardData.equipmentDescription}
+                  onChange={(e) => updateCardData('equipmentDescription', e.target.value)}
+                  style={{ ...inputStyle, height: '80px', resize: 'vertical', fontFamily: 'monospace', fontSize: '11px', fontStyle: 'italic' }}
+                  placeholder="Equipment description text... (will appear in italics with black background)"
+                />
+                <div style={{ fontSize: '11px', color: '#888', marginTop: '4px' }}>
+                  ✨ This text appears with a black background and white italics styling on the card
+                </div>
               </>
             )}
           </div>
@@ -472,6 +526,19 @@ const CardCreator = () => {
                 </label>
                 <div style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
                   Toggle the black background and border for the equipment name bar
+                </div>
+                
+                <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px', marginTop: '16px' }}>
+                  Equipment Description (Black Background, Italics)
+                </label>
+                <textarea
+                  value={cardData.equipmentDescription}
+                  onChange={(e) => updateCardData('equipmentDescription', e.target.value)}
+                  style={{ ...inputStyle, height: '80px', resize: 'vertical', fontFamily: 'monospace', fontSize: '11px', fontStyle: 'italic' }}
+                  placeholder="Equipment description text... (will appear in italics with black background)"
+                />
+                <div style={{ fontSize: '11px', color: '#888', marginTop: '4px' }}>
+                  ✨ This text appears with a black background and white italics styling on the card
                 </div>
               </>
             )}
@@ -828,6 +895,57 @@ Examples:
             />
             <div style={{ fontSize: '11px', color: '#888', marginTop: '4px' }}>
               ✨ Live preview on card! Changes appear instantly with formatted styling.
+            </div>
+          </div>
+        )}
+        
+        {selectedElement === 'equipmentDescription' && (
+          <div>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Equipment Description (Black Background, White Italics)
+            </label>
+            <textarea
+              value={cardData.equipmentDescription}
+              onChange={(e) => updateCardData('equipmentDescription', e.target.value)}
+              style={{ ...inputStyle, height: '100px', resize: 'vertical', fontFamily: 'monospace', fontSize: '11px', fontStyle: 'italic' }}
+              placeholder="Equipment description text... This will appear with a black background and white italic text on the card."
+            />
+            <div style={{ fontSize: '11px', color: '#888', marginTop: '4px' }}>
+              ✨ This text appears in a black box with white italic styling, always visible on equipment cards.
+            </div>
+            
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px', marginTop: '16px' }}>
+              Border Style
+            </label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => updateCardData('equipmentDescriptionStyle', 'diamond')}
+                style={{
+                  ...inputStyle,
+                  width: 'auto',
+                  flex: 1,
+                  backgroundColor: cardData.equipmentDescriptionStyle === 'diamond' ? '#3b82f6' : '#f9fafb',
+                  color: cardData.equipmentDescriptionStyle === 'diamond' ? 'white' : 'black',
+                  cursor: 'pointer',
+                  marginBottom: '0'
+                }}
+              >
+                ◆ Diamond
+              </button>
+              <button
+                onClick={() => updateCardData('equipmentDescriptionStyle', 'rounded')}
+                style={{
+                  ...inputStyle,
+                  width: 'auto',
+                  flex: 1,
+                  backgroundColor: cardData.equipmentDescriptionStyle === 'rounded' ? '#3b82f6' : '#f9fafb',
+                  color: cardData.equipmentDescriptionStyle === 'rounded' ? 'white' : 'black',
+                  cursor: 'pointer',
+                  marginBottom: '0'
+                }}
+              >
+                ● Rounded
+              </button>
             </div>
           </div>
         )}
@@ -1430,9 +1548,10 @@ Examples:
                        width: '92%',
                        height: '92%',
                        objectFit: 'contain',
-                       filter: `sepia(1) hue-rotate(${hexToHue(cardColors[cardData.cardColor].fg) - 115}deg) saturate(13.1)`
+                       filter: getOptimizedFilter(cardColors[cardData.cardColor].fg)
                      }}
                    />
+
                  </div>
                </CardElement>
               )}
@@ -1709,7 +1828,7 @@ Examples:
                         width: `${204 * scale}px`, // Adjusted size for the new container
                         height: `${204 * scale}px`, // Adjusted size for the new container
                         objectFit: 'contain',
-                        filter: `sepia(1) hue-rotate(${hexToHue(cardColors[cardData.cardColor].fg) - 115}deg) saturate(13.1)`,
+                        filter: getOptimizedFilter(cardColors[cardData.cardColor].fg),
                         position: 'relative',
                         zIndex: 1
                       }}
@@ -1958,31 +2077,44 @@ Examples:
           {cardData.type === 'equipment' && (
             <CardElement elementType="cardName" style={{ 
               position: 'absolute', 
-              left: `${cardWidth * 0.05 * scale}px`, 
-              right: `${cardWidth * 0.15 * scale}px`, 
-              bottom: cardData.equipmentShowBackground ? `${400 * scale}px` : `${410 * scale}px`, 
+              left: `${cardWidth * 0.04 * scale}px`, 
+              right: `${cardWidth * 0.04 * scale}px`, 
+              bottom: cardData.equipmentShowBackground ? `${390 * scale}px` : `${410 * scale}px`, 
               zIndex: 1010
             }}>
               <div style={{
                 position: 'relative',
                 width: `${cardWidth * 0.9 * scale}px`,
-                height: !cardData.equipmentShowBackground ? `${129 * scale}px` : `${139 * scale}px`,
-                backgroundColor: cardData.equipmentShowBackground ? 'black' : 'transparent',
-                border: cardData.equipmentShowBackground ? `${10 * scale}px solid #555555` : 'none',
+                height: !cardData.equipmentShowBackground ? `${149 * scale}px` : `${169 * scale}px`,
+                // First background layer - gradient from inside to outside
+                background: cardData.equipmentShowBackground ? 'radial-gradient(ellipse at center, #eaf3fe 30%, #68717a 100%)' : 'transparent',
                 borderRadius: cardData.equipmentShowBackground ? `${75 * scale}px` : '0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
+                {/* Second background layer - inset with current grey color */}
+                {cardData.equipmentShowBackground && (
+                  <div style={{
+                    position: 'absolute',
+                    top: `${12 * scale}px`,
+                    left: `${12 * scale}px`,
+                    right: `${12 * scale}px`,
+                    bottom: `${12 * scale}px`,
+                    backgroundColor: '#2f3841',
+                    borderRadius: `${63 * scale}px`, // Slightly smaller radius to match the inset
+                    zIndex: 1
+                  }} />
+                )}
                 {/* First render: Stroke outline */}
                 <h2 
                   className={`equipment-card-name-stroke equipment-card-name-stroke-${cardData.type}`}
                   style={{ 
-                    fontSize: `${100 * scale}px`, 
+                    fontSize: `${95 * scale}px`, 
                     fontWeight: 'bold', 
                     margin: 0, 
                     lineHeight: `${119 * scale}px`,
-                    WebkitTextStroke: !cardData.equipmentShowBackground ? '6px white' : 'none',
+                    WebkitTextStroke: !cardData.equipmentShowBackground ? '4px white' : 'none',
                     color: !cardData.equipmentShowBackground ? 'transparent' : 'transparent',
                     textShadow: !cardData.equipmentShowBackground ? 'none' : 'none',
                     position: 'absolute',
@@ -1991,7 +2123,7 @@ Examples:
                     transform: 'translate(-50%, -50%)',
                     width: '100%',
                     textAlign: 'center',
-                    zIndex: 1,
+                    zIndex: 3,
                     ...helveticaFont 
                   }}
                 >
@@ -2002,7 +2134,7 @@ Examples:
                 <h2 
                   className={`equipment-card-name-text equipment-card-name-text-${cardData.type}`}
                   style={{ 
-                    fontSize: `${100 * scale}px`, 
+                    fontSize: `${95 * scale}px`, 
                     fontWeight: 'bold', 
                     margin: 0, 
                     lineHeight: `${119 * scale}px`,
@@ -2013,7 +2145,7 @@ Examples:
                     transform: 'translate(-50%, -50%)',
                     width: '100%',
                     textAlign: 'center',
-                    zIndex: 2,
+                    zIndex: 3,
                     ...helveticaFont 
                   }}
                 >
@@ -2035,6 +2167,63 @@ Examples:
             mode={cardData.elementMode}
             updateCardData={updateCardData}
           />
+
+          {/* Equipment Description - Only for equipment cards */}
+          {cardData.type === 'equipment' && (
+            <CardElement elementType="equipmentDescription" style={{ 
+              position: 'absolute', 
+              left: `${96 * scale}px`, 
+              right: `${96 * scale}px`, 
+              bottom: `${165 * scale}px`,
+              zIndex: 10
+            }}>
+              <div style={{
+                backgroundColor: 'black',
+                color: 'white',
+                padding: `${39 * scale}px ${74 * scale}px ${25 * scale}px ${74 * scale}px`,
+                fontSize: `${42 * scale}px`, // Increased by 1.3x (32 * 1.3 ≈ 42)
+                fontStyle: 'italic',
+                lineHeight: 1.3,
+                textAlign: 'left', // Changed from center to left to accommodate diamond
+                minHeight: `${95 * scale}px`, // Increased proportionally
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                // Conditional styling based on equipmentDescriptionStyle
+                ...(cardData.equipmentDescriptionStyle === 'diamond' 
+                  ? {
+                      clipPath: `polygon(${90 * scale}px 0%, calc(100% - ${90 * scale}px) 0%, 100% 50%, calc(100% - ${90 * scale}px) 100%, ${90 * scale}px 100%, 0% 50%)` // Diamond shape with exact 45-degree angles
+                    }
+                  : {
+                      borderRadius: `${90 * scale}px` // Rounded edges
+                    }
+                ),
+                position: 'relative',
+                ...helveticaFont
+              }}>
+                {/* White diamond on the left */}
+                <div style={{
+                  width: `${17 * scale}px`,
+                  height: `${17 * scale}px`,
+                  backgroundColor: 'white',
+                  transform: 'rotate(45deg)',
+                  marginRight: `${16 * scale}px`,
+                  marginLeft: `${10 * scale}px`, // Equal horizontal displacement
+                  flexShrink: 0,
+                  marginTop: `-${60 * scale}px`,
+                  alignSelf: 'center' // Centers the diamond vertically for equal displacement
+                }} />
+                
+                {/* Text content */}
+                <div style={{
+                  flex: 1,
+                  paddingRight: `${12 * scale}px` // Account for the clipped right edge
+                }}>
+                  {cardData.equipmentDescription}
+                </div>
+              </div>
+            </CardElement>
+          )}
             </>
           )}
         </div>

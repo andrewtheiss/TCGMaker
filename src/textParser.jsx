@@ -15,19 +15,20 @@ export const parseFormattedText = (text, baseStyle = {}) => {
       // Special handling for tap image
       if (keywordConfig.isImage) {
         return (
-          <span key={index} style={{ display: 'inline-block', margin: '0 2px' }}>
+          <span key={index} style={{ display: 'inline-block', margin: '0', lineHeight: `calc(${baseStyle.lineHeight || '1em'} - 2px)` }}>
             <img 
               src={keywordConfig.imageSrc} 
               alt="tap" 
               style={{ 
                 height: baseStyle.fontSize || '1em',
                 verticalAlign: 'middle',
-                margin: '0 2px'
+                margin: '0'
               }} 
             />
             <span style={{ 
               fontWeight: keywordConfig.fontWeight,
               textShadow: keywordConfig.textShadow,
+              lineHeight: `calc(${baseStyle.lineHeight || '1em'} - 2px)`,
               ...baseStyle
             }}>
               {keywordConfig.displayText}
@@ -41,7 +42,8 @@ export const parseFormattedText = (text, baseStyle = {}) => {
           key={index}
           style={{
             display: 'inline-block',
-            margin: keywordConfig.margin || '0 2px',
+            margin: '0', // Remove left and right margin
+            lineHeight: `calc(${baseStyle.lineHeight || '1em'} - 2px)`, // Reduce line height by 2px
             ...keywordConfig,
             fontSize: `calc(${baseStyle.fontSize || '1em'} * ${keywordConfig.fontSize || '1'})`,
             textShadow: keywordConfig.textShadow || 'none'

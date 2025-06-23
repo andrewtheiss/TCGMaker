@@ -35,7 +35,7 @@ const CardStats = ({ cardData, CardElement, currentMode, scale, helveticaFont })
                     left: `${-8 * scale}px`,
                     width: `${173 * scale}px`,
                     height: `${173 * scale}px`,
-                    backgroundColor: '#666666',
+                    backgroundColor: '#c2cdd5',
                     transform: currentMode.statsDiamonds.transform,
                     borderRadius: '8px',
                     zIndex: -1
