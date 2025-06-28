@@ -95,7 +95,6 @@ const CardElements = ({
               lineHeight: currentMode.typeLine.height,
               minWidth: '100px',
               margin: '0px -1px 0px -1px',
-              lineHeight: '18px',
               borderRadius: currentMode.typeLine.borderRadius,
               ...helveticaFont
             }}>

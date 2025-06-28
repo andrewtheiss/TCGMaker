@@ -70,7 +70,6 @@ const LeaderHeader = ({
             backgroundColor: cardColors[cardData.cardColor].bg,
             color: 'white',
             lineHeight: `${17 * scale}px`,
-            minWidth: `${120 * scale}px`,
             borderRadius: '0px',
             ...helveticaFont
           }}>
@@ -102,7 +101,6 @@ const LeaderHeader = ({
             backgroundColor: cardColors[cardData.cardColor].bg,
             color: 'white',
             lineHeight: `${17 * scale}px`,
-            minWidth: `${80 * scale}px`,
             borderRadius: '0px',
             ...helveticaFont
           }}>

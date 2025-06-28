@@ -1302,28 +1302,38 @@ Examples:
               { value: 'creature', label: 'Classic', desc: 'Standard creature cards with attack & defense' },
               { value: 'equipment', label: 'Equipment', desc: 'Equipment cards with attack focus' },
               { value: 'leader', label: 'Leader', desc: 'Leader cards with special header & defense focus' }
-            ].map(({ value, label, desc }) => (
-              <button
-                key={value}
-                onClick={() => updateCardData('type', value)}
-                style={{
-                  ...inputStyle,
-                  backgroundColor: cardData.type === value ? '#3b82f6' : '#f9fafb',
-                  color: cardData.type === value ? 'white' : 'black',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  cursor: 'pointer',
-                  marginBottom: '4px',
-                  padding: '12px'
-                }}
-              >
-                <span style={{ fontWeight: '600', marginBottom: '2px' }}>{label}</span>
-                <span style={{ fontSize: '12px', opacity: 0.8, lineHeight: '1.3' }}>
-                  {desc}
-                </span>
-              </button>
-            ))}
+            ].map(({ value, label, desc }) => {
+              const isDisabled = value === 'leader';
+              const isSelected = cardData.type === value;
+              return (
+                <button
+                  key={value}
+                  onClick={isDisabled ? undefined : () => updateCardData('type', value)}
+                  disabled={isDisabled}
+                  style={{
+                    ...inputStyle,
+                    backgroundColor: isDisabled
+                      ? '#e5e7eb'
+                      : isSelected
+                        ? '#3b82f6'
+                        : '#f9fafb',
+                    color: isDisabled ? '#9ca3af' : isSelected ? 'white' : 'black',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    cursor: isDisabled ? 'not-allowed' : 'pointer',
+                    marginBottom: '4px',
+                    padding: '12px',
+                    opacity: isDisabled ? 0.6 : 1
+                  }}
+                >
+                  <span style={{ fontWeight: '600', marginBottom: '2px' }}>{label}</span>
+                  <span style={{ fontSize: '12px', opacity: 0.8, lineHeight: '1.3' }}>
+                    {desc}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         )}
 
