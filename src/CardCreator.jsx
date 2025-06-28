@@ -5,7 +5,6 @@ import cardogImage from './assets/jade.png';
 import gatePowerImage from './assets/gatepower.png';
 import izkWhiteImage from './assets/ikz_white.png';
 import ikzBgImage from './assets/ikzbg.png';
-import ikzBackImage from './assets/ikzback.png';
 import waterImage from './assets/domain/water.png';
 import earthImage from './assets/domain/earth.png';
 import smokeImage from './assets/domain/smoke.png';
@@ -16,6 +15,7 @@ import LeaderHeader from './LeaderHeader';
 import CardGatePower from './CardGatePower';
 import CardBorder from './CardBorder';
 import CardFooterText from './CardFooterText';
+import backImage from './assets/back.png';
 
 // Note: ColoredImage component removed - now using pre-generated colored images directly
 
@@ -341,6 +341,22 @@ const CardCreator = () => {
       height: `${cardHeight * scale}px`,
       boxSizing: 'border-box'
     }}>
+      {/* Full card back background image */}
+      <img
+        src={backImage}
+        alt="Card back background"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          borderRadius: `${64 * scale}px`,
+          zIndex: 0
+        }}
+      />
+      
       {/* Standard black border like front card */}
       <div style={{
         position: 'absolute',
@@ -360,32 +376,12 @@ const CardCreator = () => {
         left: `${63 * scale}px`,
         right: `${63 * scale}px`,
         bottom: `${63 * scale}px`,
-        backgroundColor: '#34404e',
+        backgroundColor: 'transparent',
         borderRadius: `${40 * scale}px`,
-        zIndex: 20
+        zIndex: 2
       }} />
       
-      {/* Center image */}
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        zIndex: 3,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <img 
-          src={ikzBackImage} 
-          alt="Card back center" 
-          style={{ 
-            maxWidth: `${(cardWidth * 0.6) * scale}px`,
-            maxHeight: `${(cardHeight * 0.6) * scale}px`,
-            objectFit: 'contain'
-          }}
-        />
-      </div>
+      {/* Center area intentionally left blank after removing icon */}
     </div>
   );
 
@@ -892,6 +888,33 @@ const CardCreator = () => {
                   }}
                 >
                   Main
+                </button>
+
+                {/* Response keyword button */}
+                <button
+                  onClick={() => {
+                    const textarea = document.querySelector('textarea');
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = cardData.textBox.substring(0, cursorPos);
+                    const textAfter = cardData.textBox.substring(cursorPos);
+                    updateCardData('textBox', textBefore + '%response%' + textAfter);
+                  }}
+                  style={{
+                    backgroundColor: '#2092d2',
+                    color: 'white',
+                    borderRadius: '6px',
+                    padding: '0 6px 0 18px',
+                    fontSize: '8px',
+                    fontWeight: 'bold',
+                    border: 'none',
+                    cursor: 'pointer',
+                    backgroundImage: 'url(/src/assets/response.png)',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '10px 10px',
+                    backgroundPosition: '4px center'
+                  }}
+                >
+                  Response
                 </button>
               </div>
               
@@ -2436,22 +2459,8 @@ Examples:
           🃏 Card Type: {cardData.type === 'creature' ? 'Classic' : cardData.type === 'equipment' ? 'Equipment' : 'Leader'}
         </button>
         
-        <button
-          onClick={regenerateFireAssets}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#dc2626',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500'
-          }}
-        >
-          🔥 Regen Fire Assets
-        </button>
-        
+        {/* 🔥 Regen Fire Assets button hidden as per request */}
+
         {cardData.overlayImage && (
           <button
             onClick={() => setShowOverlay(!showOverlay)}

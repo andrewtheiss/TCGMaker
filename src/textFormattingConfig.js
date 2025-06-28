@@ -76,6 +76,20 @@ export const textFormattingConfig = {
       fontSize: '0.9em',
       fontWeight: 'bold',
       textShadow: 'none'
+    },
+    '%response%': {
+      displayText: 'Response',
+      backgroundColor: '#2092d2',
+      color: 'white',
+      borderRadius: '12px',
+      padding: '0 10px 0 26px', // space for icon
+      fontSize: '0.9em',
+      fontWeight: 'bold',
+      textShadow: 'none',
+      backgroundImage: 'url(/src/assets/response.png)',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: '14px 14px',
+      backgroundPosition: '8px center'
     }
   },
   
