@@ -16,6 +16,7 @@ import CardGatePower from './CardGatePower';
 import CardBorder from './CardBorder';
 import CardFooterText from './CardFooterText';
 import backImage from './assets/back.png';
+import responseIcon from './assets/response.png';
 
 // Note: ColoredImage component removed - now using pre-generated colored images directly
 
@@ -908,7 +909,7 @@ const CardCreator = () => {
                     fontWeight: 'bold',
                     border: 'none',
                     cursor: 'pointer',
-                    backgroundImage: 'url(/src/assets/response.png)',
+                    backgroundImage: `url(${responseIcon})`,
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: '10px 10px',
                     backgroundPosition: '4px center'

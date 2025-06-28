@@ -1,6 +1,8 @@
 // Text Formatting Configuration
 // This file defines the styling rules for special tokens in card ability text
 
+import responseIcon from './assets/response.png';
+
 export const textFormattingConfig = {
   // Special keyword tokens with custom styling
   keywords: {
@@ -86,7 +88,7 @@ export const textFormattingConfig = {
       fontSize: '0.9em',
       fontWeight: 'bold',
       textShadow: 'none',
-      backgroundImage: 'url(/src/assets/response.png)',
+      backgroundImage: `url(${responseIcon})`,
       backgroundRepeat: 'no-repeat',
       backgroundSize: '14px 14px',
       backgroundPosition: '8px center'
