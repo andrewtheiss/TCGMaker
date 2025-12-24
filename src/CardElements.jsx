@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import CardAbilityText from './CardAbilityText';
 import CardStats from './CardStats';
 
@@ -17,6 +17,18 @@ const CardElements = ({
   // Define mode-specific styles - all modes are same as classic for now
   // Equipment mode positioning is raised by 50px
   const equipmentOffset = cardData.type === 'equipment' ? 160 : 0;
+
+  // Type-line label: render as ONE SVG-backed shape (no seams in-browser or html2canvas exports)
+  const TYPE_CAP_PX = 12;      // width of each angled cap
+  const TYPE_PAD_PX = 16;      // horizontal padding for text inside the bar
+  const labelTextRef = useRef(null);
+  const [typeLabelWidth, setTypeLabelWidth] = useState(120);
+
+  const typeLineLabel = useMemo(() => {
+    const base = cardData.typeDisplayText || cardData.type;
+    if (cardData.showSubtype && cardData.subtype) return `${base}, ${cardData.subtype}`;
+    return base;
+  }, [cardData.typeDisplayText, cardData.type, cardData.showSubtype, cardData.subtype]);
   
   const classicStyle = {
     typeLine: {
@@ -54,6 +66,22 @@ const CardElements = ({
 
   const currentMode = modeStyles[mode];
 
+  const typeLineHeightPx = Number.parseInt(currentMode.typeLine.height, 10) || 17;
+
+  useLayoutEffect(() => {
+    const el = labelTextRef.current;
+    if (!el) return;
+
+    // Measure the text width in the actual rendered font, then size the SVG shape in px.
+    const textWidth = el.getBoundingClientRect().width;
+    const nextWidth = Math.max(
+      120,
+      Math.ceil(textWidth + (TYPE_PAD_PX * 2) + (TYPE_CAP_PX * 2))
+    );
+
+    setTypeLabelWidth((prev) => (prev === nextWidth ? prev : nextWidth));
+  }, [typeLineLabel, TYPE_CAP_PX, TYPE_PAD_PX]);
+
   return (
     <>
       {/* Type Line - Positioned absolutely to card */}
@@ -70,62 +98,64 @@ const CardElements = ({
         pointerEvents: 'auto'
       }}>
         <div style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}>
-          {/* Left triangle edge using SVG */}
-          <svg
-            viewBox="0 0 12 19"
-            preserveAspectRatio="none"
-            shapeRendering="crispEdges"
-            style={{ width: '12px', height: '100%', display: 'block', marginRight: '-1px' }}
-          >
-            <polygon
-              points="0,9.5 12,0 12,19"
-              fill={cardColors[cardData.cardColor].bg}
-            />
-          </svg>
-          
-          {/* Main type bar */}
-          <CardElement elementType="type" style={{ height: '100%' }}>
+          {/* Single-piece type bar (caps + center as one polygon). */}
+          <CardElement elementType="type" style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
             <div style={{
+              position: 'relative',
               height: '100%',
-              padding: '0px 16px',
+              width: `${typeLabelWidth}px`,
+              minWidth: '120px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '12px',
-              fontWeight: '600',
-              textAlign: 'center',
-              whiteSpace: 'nowrap',
-              backgroundColor: cardColors[cardData.cardColor].bg,
-              color: 'white',
-              lineHeight: currentMode.typeLine.height,
-              minWidth: '100px',
-              // Slight overlap removes 1px seams (both in-browser and in html2canvas exports)
-              margin: '0px -1px',
-              borderRadius: currentMode.typeLine.borderRadius,
-              ...helveticaFont
+              justifyContent: 'center'
             }}>
-              <span style={{ textTransform: 'capitalize' }}>{cardData.typeDisplayText || cardData.type}</span>
-              {cardData.showSubtype && cardData.subtype && (
-                <>
-                  <span style={{ margin: '0 2px' }}>,</span>
-                  <span>{cardData.subtype}</span>
-                </>
-              )}
+              <svg
+                viewBox={`0 0 ${typeLabelWidth} ${typeLineHeightPx}`}
+                preserveAspectRatio="none"
+                shapeRendering="crispEdges"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  display: 'block'
+                }}
+              >
+                <polygon
+                  points={[
+                    `0,${typeLineHeightPx / 2}`,
+                    `${TYPE_CAP_PX},0`,
+                    `${typeLabelWidth - TYPE_CAP_PX},0`,
+                    `${typeLabelWidth},${typeLineHeightPx / 2}`,
+                    `${typeLabelWidth - TYPE_CAP_PX},${typeLineHeightPx}`,
+                    `${TYPE_CAP_PX},${typeLineHeightPx}`
+                  ].join(' ')}
+                  fill={cardColors[cardData.cardColor].bg}
+                />
+              </svg>
+
+              <span style={{
+                position: 'relative',
+                zIndex: 1,
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: `0px ${TYPE_PAD_PX}px`,
+                color: 'white',
+                fontSize: '12px',
+                fontWeight: '600',
+                textAlign: 'center',
+                whiteSpace: 'nowrap',
+                lineHeight: currentMode.typeLine.height,
+                ...helveticaFont
+              }}>
+                <span ref={labelTextRef} style={{ textTransform: 'capitalize' }}>
+                  {typeLineLabel}
+                </span>
+              </span>
             </div>
           </CardElement>
-          
-          {/* Right triangle edge using SVG */}
-          <svg
-            viewBox="0 0 12 19"
-            preserveAspectRatio="none"
-            shapeRendering="crispEdges"
-            style={{ width: '12px', height: '100%', display: 'block', marginLeft: '-1px' }}
-          >
-            <polygon
-              points="0,0 0,19 12,9.5"
-              fill={cardColors[cardData.cardColor].bg}
-            />
-          </svg>
         </div>
       </div>
 
