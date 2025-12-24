@@ -71,9 +71,14 @@ const CardElements = ({
       }}>
         <div style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}>
           {/* Left triangle edge using SVG */}
-          <svg width="12" height="19">
-            <polygon 
-              points="0,9.5 11,1 11,18"
+          <svg
+            viewBox="0 0 12 19"
+            preserveAspectRatio="none"
+            shapeRendering="crispEdges"
+            style={{ width: '12px', height: '100%', display: 'block', marginRight: '-1px' }}
+          >
+            <polygon
+              points="0,9.5 12,0 12,19"
               fill={cardColors[cardData.cardColor].bg}
             />
           </svg>
@@ -81,8 +86,8 @@ const CardElements = ({
           {/* Main type bar */}
           <CardElement elementType="type" style={{ height: '100%' }}>
             <div style={{
-              height: '88%',
-              padding: '0px 16px 2px 16px',
+              height: '100%',
+              padding: '0px 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -94,7 +99,8 @@ const CardElements = ({
               color: 'white',
               lineHeight: currentMode.typeLine.height,
               minWidth: '100px',
-              margin: '0px -1px 0px -1px',
+              // Slight overlap removes 1px seams (both in-browser and in html2canvas exports)
+              margin: '0px -1px',
               borderRadius: currentMode.typeLine.borderRadius,
               ...helveticaFont
             }}>
@@ -109,9 +115,14 @@ const CardElements = ({
           </CardElement>
           
           {/* Right triangle edge using SVG */}
-          <svg width="12" height="19">
-            <polygon 
-              points="0.999,1 1,18 12,9.5"
+          <svg
+            viewBox="0 0 12 19"
+            preserveAspectRatio="none"
+            shapeRendering="crispEdges"
+            style={{ width: '12px', height: '100%', display: 'block', marginLeft: '-1px' }}
+          >
+            <polygon
+              points="0,0 0,19 12,9.5"
               fill={cardColors[cardData.cardColor].bg}
             />
           </svg>

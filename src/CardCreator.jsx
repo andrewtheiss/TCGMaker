@@ -53,6 +53,7 @@ const CardCreator = () => {
     footerLeft: 'STT 01-069',
     footerCenter: 'BBB',
     footerRarity: 'SAR',
+    footerRarityShowStar: false,
     copyrightText: 'Your Name Here',
     raritySymbol: 'α',
     showRarityStamp: true,
@@ -1238,13 +1239,31 @@ Examples:
         )}
         
         {selectedElement === 'footerRarity' && (
-          <input
-            type="text"
-            value={cardData.footerRarity}
-            onChange={(e) => updateCardData('footerRarity', e.target.value)}
-            style={inputStyle}
-            placeholder="Rarity (U, C, UC, SAR, etc.)"
-          />
+          <div>
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '8px' }}>
+              Footer Rarity Letters
+            </label>
+            <input
+              type="text"
+              value={cardData.footerRarity}
+              onChange={(e) => updateCardData('footerRarity', e.target.value)}
+              style={inputStyle}
+              placeholder="Rarity (U, C, UC, SAR, etc.)"
+            />
+
+            <label style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '4px', marginTop: '12px' }}>
+              <input
+                type="checkbox"
+                checked={!!cardData.footerRarityShowStar}
+                onChange={(e) => updateCardData('footerRarityShowStar', e.target.checked)}
+                style={{ marginRight: '8px' }}
+              />
+              Show rarity star (left of letters)
+            </label>
+            <div style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
+              Adds space on the left and renders a black star with a white outline.
+            </div>
+          </div>
         )}
         
         {selectedElement === 'footerLeft' && (
