@@ -21,6 +21,11 @@ import responseIcon from './assets/response.png';
 // Note: ColoredImage component removed - now using pre-generated colored images directly
 
 const CardCreator = () => {
+  // Default reference overlay shown only until the user first interacts with the card.
+  const DEFAULT_OVERLAY_IMAGE = cardogImage;
+  // Dev-only UI: keep this false to hide the reference upload button in production.
+  const SHOW_REFERENCE_UPLOAD_BUTTON = false;
+
   const [cardData, setCardData] = useState({
     name: 'Card Name',
     cardColor: 'purp',
@@ -42,7 +47,7 @@ const CardCreator = () => {
     rightIconDomain: 'water',
     setCode: 'Elemental',
     cardNumber: '10002',
-    overlayImage: cardogImage,
+    overlayImage: DEFAULT_OVERLAY_IMAGE,
     gatePower: '2',
     showGatePower: true,
     footerLeft: 'STT 01-069',
@@ -67,6 +72,7 @@ const CardCreator = () => {
 
   const [selectedElement, setSelectedElement] = useState(null);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [dismissedDefaultOverlay, setDismissedDefaultOverlay] = useState(false);
   const [showCardBack, setShowCardBack] = useState(false);
   const fileInputRef = useRef(null);
   const overlayInputRef = useRef(null);
@@ -264,10 +270,23 @@ const CardCreator = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setCardData({ ...cardData, overlayImage: e.target.result });
+        // User explicitly uploaded a reference; don't ever show the default again.
+        setDismissedDefaultOverlay(true);
+        setShowOverlay(true);
+        setCardData((prev) => ({ ...prev, overlayImage: e.target.result }));
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const dismissDefaultOverlayOnce = () => {
+    // Only dismiss the *default* overlay (not user-uploaded overlays), and only once.
+    if (dismissedDefaultOverlay) return;
+    if (cardData.overlayImage !== DEFAULT_OVERLAY_IMAGE) return;
+
+    setDismissedDefaultOverlay(true);
+    setShowOverlay(false);
+    setCardData((prev) => ({ ...prev, overlayImage: null }));
   };
 
   const downloadCard = async () => {
@@ -1534,6 +1553,9 @@ Examples:
             transform: 'scale(1)',
             transformOrigin: 'center'
           }}
+          onMouseEnterCapture={dismissDefaultOverlayOnce}
+          onMouseDownCapture={dismissDefaultOverlayOnce}
+          onTouchStartCapture={dismissDefaultOverlayOnce}
         >
           {showCardBack ? (
             <CardBack />
@@ -2437,22 +2459,25 @@ Examples:
         >
           {showCardBack ? '🔄 Show Front' : '🔄 Show Back'}
         </button>
-        
-        <button
-          onClick={() => overlayInputRef.current?.click()}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#374151',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500'
-          }}
-        >
-          {cardData.overlayImage ? 'Change Reference' : 'Upload Reference'}
-        </button>
+
+        {/* Dev-only: reference overlay upload button (hidden by default) */}
+        {SHOW_REFERENCE_UPLOAD_BUTTON && (
+          <button
+            onClick={() => overlayInputRef.current?.click()}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#374151',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}
+          >
+            {cardData.overlayImage ? 'Change Reference' : 'Upload Reference'}
+          </button>
+        )}
         
         <button
           onClick={() => setSelectedElement('cardType')}
