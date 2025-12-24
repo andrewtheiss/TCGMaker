@@ -1,10 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import beanImage from './assets/bean.png';
 import cardogImage from './assets/jade.png';
-import gatePowerImage from './assets/gatepower.png';
 import izkWhiteImage from './assets/ikz_white.png';
-import ikzBgImage from './assets/ikzbg.png';
 import waterImage from './assets/domain/water.png';
 import earthImage from './assets/domain/earth.png';
 import smokeImage from './assets/domain/smoke.png';
@@ -17,13 +15,14 @@ import CardBorder from './CardBorder';
 import CardFooterText from './CardFooterText';
 import backImage from './assets/back.png';
 import responseIcon from './assets/response.png';
+import OverlayImageEditorModal from './OverlayImageEditorModal';
 
 // Note: ColoredImage component removed - now using pre-generated colored images directly
 
 const CardCreator = () => {
   // Default reference overlay shown only until the user first interacts with the card.
   const DEFAULT_OVERLAY_IMAGE = cardogImage;
-  // Dev-only UI: keep this false to hide the reference upload button in production.
+  // Reference overlay upload button (keep off; editor is for background).
   const SHOW_REFERENCE_UPLOAD_BUTTON = false;
 
   const [cardData, setCardData] = useState({
@@ -75,9 +74,12 @@ const CardCreator = () => {
   const [showOverlay, setShowOverlay] = useState(true);
   const [dismissedDefaultOverlay, setDismissedDefaultOverlay] = useState(false);
   const [showCardBack, setShowCardBack] = useState(false);
+  const [backgroundEditorOpen, setBackgroundEditorOpen] = useState(false);
+  const [backgroundEditorSrc, setBackgroundEditorSrc] = useState(null);
   const fileInputRef = useRef(null);
   const overlayInputRef = useRef(null);
   const cardRef = useRef(null);
+  const circularTextPathIdRef = useRef(`circle-path-${Math.random().toString(36).slice(2)}`);
 
   const helveticaFont = { fontFamily: 'Helvetica, Arial, sans-serif' };
 
@@ -85,6 +87,7 @@ const CardCreator = () => {
   const cardWidth = 1500;
   const cardHeight = 2100;
   const scale = 0.25; // Scale down for display (375px x 525px)
+  const px = (n) => Math.round(n * scale);
 
   // Convert hex color to RGB object
   const hexToRgb = (hex) => {
@@ -156,7 +159,7 @@ const CardCreator = () => {
       try {
         // Import colored domain image: /src/assets/water_purple.png, etc.
         return new URL(`./assets/${domain}_${colorName}.png`, import.meta.url).href;
-      } catch (error) {
+      } catch {
         console.warn(`Colored domain image not found: ${domain}_${colorName}.png, falling back to original`);
         return getDomainImage(domain);
       }
@@ -167,7 +170,7 @@ const CardCreator = () => {
       try {
         // Import colored IKZ image: /src/assets/ikz_white_purple.png, etc.
         return new URL(`./assets/ikz_white_${colorName}.png`, import.meta.url).href;
-      } catch (error) {
+      } catch {
         console.warn(`Colored IKZ image not found: ikz_white_${colorName}.png, falling back to original`);
         return izkWhiteImage;
       }
@@ -176,8 +179,8 @@ const CardCreator = () => {
     return baseImageName;
   };
 
-  // Regenerate fire-colored images with updated color
-  const regenerateFireAssets = async () => {
+  // Dev helper: regenerate fire-colored images with updated color
+  const REGENERATE_FIRE_ASSETS = async () => {
     const fireColor = '#ff9c61'; // Updated fire color: rgb(255, 156, 97)
     const domains = ['water', 'earth', 'smoke', 'lightning', 'fire'];
     let downloadCount = 0;
@@ -248,7 +251,8 @@ const CardCreator = () => {
     fire: { bg: '#c4353d', fg: '#ff9c61' }
   };
 
-  const rarityColors = {
+  // Reserved for future rarity styling.
+  const RARITY_COLORS = {
     common: '#000000',
     uncommon: '#C0C0C0',
     rare: '#FFD700',
@@ -256,29 +260,47 @@ const CardCreator = () => {
   };
 
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setCardData({ ...cardData, backgroundImage: e.target.result });
-      };
-      reader.readAsDataURL(file);
-    }
+    const file = e.target.files?.[0];
+    // Allow selecting the same file again.
+    e.target.value = '';
+    if (!file) return;
+
+    const objectUrl = URL.createObjectURL(file);
+    setBackgroundEditorSrc((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return objectUrl;
+    });
+    setBackgroundEditorOpen(true);
   };
 
   const handleOverlayUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = (evt) => {
         // User explicitly uploaded a reference; don't ever show the default again.
         setDismissedDefaultOverlay(true);
         setShowOverlay(true);
-        setCardData((prev) => ({ ...prev, overlayImage: e.target.result }));
+        setCardData((prev) => ({ ...prev, overlayImage: evt.target.result }));
       };
       reader.readAsDataURL(file);
     }
   };
+
+  const closeBackgroundEditor = () => {
+    setBackgroundEditorOpen(false);
+    setBackgroundEditorSrc((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+  };
+
+  // Ensure we never leak object URLs if the component unmounts while the editor is open.
+  useEffect(() => {
+    return () => {
+      if (backgroundEditorSrc) URL.revokeObjectURL(backgroundEditorSrc);
+    };
+  }, [backgroundEditorSrc]);
 
   const dismissDefaultOverlayOnce = () => {
     // Only dismiss the *default* overlay (not user-uploaded overlays), and only once.
@@ -1491,8 +1513,6 @@ Examples:
     );
   };
 
-  const cardConfig = cardColors[cardData.cardColor];
-
   const textShadowStyle = {
     textShadow: `
       -1px -1px 0 white,
@@ -1503,15 +1523,6 @@ Examples:
       1px 0 0 white,
       0 -1px 0 white,
       -1px 0 0 white
-    `
-  };
-
-  const smallTextShadowStyle = {
-    textShadow: `
-      -0.5px -0.5px 0 white,
-      0.5px -0.5px 0 white,
-      -0.5px 0.5px 0 white,
-      0.5px 0.5px 0 white
     `
   };
 
@@ -1556,6 +1567,17 @@ Examples:
         onChange={handleOverlayUpload}
         accept="image/*"
         style={{ display: 'none' }}
+      />
+
+      <OverlayImageEditorModal
+        isOpen={backgroundEditorOpen}
+        imageSrc={backgroundEditorSrc}
+        title="Edit Background Image"
+        onCancel={closeBackgroundEditor}
+        onApply={(bakedPngDataUrl) => {
+          setCardData((prev) => ({ ...prev, backgroundImage: bakedPngDataUrl }));
+          closeBackgroundEditor();
+        }}
       />
       
       {/* Card Container */}
@@ -1842,116 +1864,85 @@ Examples:
                 }}
               >
                 
-                                  {/* CIRCULAR TEXT AREA - Text that curves around the outer perimeter */}
+                {/* CIRCULAR TEXT AREA - Text that curves around the outer perimeter */}
                   <CardElement elementType="circularText" style={{ position: 'absolute', top: -7, left: 2, width: '100%', height: '100%' }}>
-                    {/* CIRCULAR TEXT STROKE LEFT - First render with black stroke outline (counter-clockwise) */}
-                    <svg 
-                      className="circular-text-stroke-svg"
-                      width={`${220 * scale}px`} 
-                      height={`${520 * scale}px`} 
-                      style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }}
-                    >
-                      <defs>
-                                              <path 
-                        id="circle-path-stroke" 
-                        d={cardData.flipCircularText 
-                          ? `M ${109.99 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 0 ${110 * scale} ${20 * scale}`
-                          : `M ${110 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 1 ${109.99 * scale} ${20 * scale}`
-                        }
-                      />
-                      </defs>
-                      <text 
-                        className="circular-text-stroke"
-                        fontSize={`${40 * scale}px`} 
-                        fill="transparent"
-                        fontWeight="900"
-                        stroke="black"
-                        strokeWidth={`${14 * scale}px`}
-                        strokeLinejoin="round"
-                        strokeLinecap="round"
-                        style={{ 
-                          ...helveticaFont,
-                          fontWeight: '900',
-                          letterSpacing: `${6.975 * scale}px`
-                        }}
-                      >
-                        <textPath href="#circle-path-stroke" startOffset={`${cardData.textRotation}%`}>
-                          {cardData.circularText || 'GATE'}
-                        </textPath>
-                      </text>
-                    </svg>
+                    {(() => {
+                      // NOTE:
+                      // - The circle radius is 120, so its diameter is 240.
+                      // - The previous 220px-wide SVG viewport clipped the left side (the path extends to x = -10).
+                      // - Using an unscaled viewBox and letting the SVG scale via width/height keeps everything aligned
+                      //   across display/export scales and ensures the stroke+fill match perfectly.
+                      const VB_W = 240;
+                      const VB_H = 520;
+                      const R = 120;
+                      const CX = 120;
+                      const TOP_Y = 20;
+                      const EPS = 0.01;
 
-                    {/* CIRCULAR TEXT STROKE RIGHT - Second render with black stroke outline (clockwise) */}
-                    <svg 
-                      className="circular-text-stroke-right-svg"
-                      width={`${220 * scale}px`} 
-                      height={`${520 * scale}px`} 
-                      style={{ position: 'absolute', top: 0, left: `${2 * scale}px`, zIndex: 1 }}
-                    >
-                      <defs>
-                                              <path 
-                        id="circle-path-stroke-right" 
-                        d={cardData.flipCircularText 
-                          ? `M ${109.99 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 0 ${110 * scale} ${20 * scale}`
-                          : `M ${110 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 1 ${109.99 * scale} ${20 * scale}`
-                        }
-                      />
-                      </defs>
-                      <text 
-                        className="circular-text-stroke-right"
-                        fontSize={`${40 * scale}px`} 
-                        fill="transparent"
-                        fontWeight="900"
-                        stroke="black"
-                        strokeWidth={`${14 * scale}px`}
-                        strokeLinejoin="round"
-                        strokeLinecap="round"
-                        style={{ 
-                          ...helveticaFont,
-                          fontWeight: '900',
-                          letterSpacing: `${6.975 * scale}px`
-                        }}
-                      >
-                        <textPath href="#circle-path-stroke-right" startOffset={`${cardData.textRotation - 1}%`}>
-                          {cardData.circularText || 'GATE'}
-                        </textPath>
-                      </text>
-                    </svg>
-                    
-                    {/* CIRCULAR TEXT FILL - Second render with clean white text overlay */}
-                    <svg 
-                      className="circular-text-fill-svg"
+                      const circlePathId = circularTextPathIdRef.current;
+                      const d = cardData.flipCircularText
+                        ? `M ${CX - EPS} ${TOP_Y} A ${R} ${R} 0 1 0 ${CX} ${TOP_Y}`
+                        : `M ${CX} ${TOP_Y} A ${R} ${R} 0 1 1 ${CX - EPS} ${TOP_Y}`;
 
-                      width={`${220 * scale}px`} 
-                      height={`${520 * scale}px`} 
-                      style={{ position: 'absolute', top: 0, left: -1, zIndex: 2 }}
-                    >
-                      <defs>
-                                              <path 
-                        id="circle-path-fill" 
-                        d={cardData.flipCircularText 
-                          ? `M ${107.99 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 0 ${108 * scale} ${20 * scale}`
-                          : `M ${108 * scale} ${20 * scale} A ${120 * scale} ${120 * scale} 0 1 1 ${107.99 * scale} ${20 * scale}`
-                        }
-                      />
-                      </defs>
-                      <text 
-                        className="circular-text-fill"
-                        fontSize={`${40 * scale}px`} 
-                        fill="white"
-                        fontWeight="900"
-                        stroke="none"
-                        style={{ 
-                          ...helveticaFont,
-                          fontWeight: '900',
-                          letterSpacing: `${6.975 * scale}px`
-                        }}
-                      >
-                        <textPath href="#circle-path-fill" startOffset={`${cardData.textRotation}%`}>
-                          {cardData.circularText || 'GATE'}
-                        </textPath>
-                      </text>
-                    </svg>
+                      return (
+                        <svg
+                          className="circular-text-svg"
+                          width={`${VB_W * scale}px`}
+                          height={`${VB_H * scale}px`}
+                          viewBox={`0 0 ${VB_W} ${VB_H}`}
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: `${-10 * scale}px`,
+                            zIndex: 2,
+                            overflow: 'visible'
+                          }}
+                        >
+                          <defs>
+                            <path id={circlePathId} d={d} />
+                          </defs>
+
+                          {/* Stroke (outline) */}
+                          <text
+                            className="circular-text-stroke"
+                            fontSize={40}
+                            fill="transparent"
+                            fontWeight="900"
+                            stroke="black"
+                            strokeWidth={14}
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                            style={{
+                              ...helveticaFont,
+                              fontWeight: '900',
+                              letterSpacing: '6.975px'
+                            }}
+                          >
+                            <textPath href={`#${circlePathId}`} startOffset={`${cardData.textRotation}%`}>
+                              {cardData.circularText || 'GATE'}
+                            </textPath>
+                          </text>
+
+                          {/* Fill */}
+                          <text
+                            className="circular-text-fill"
+                            fontSize={40}
+                            fill="white"
+                            fontWeight="900"
+                            stroke="none"
+                            style={{
+                              ...helveticaFont,
+                              fontWeight: '900',
+                              letterSpacing: '6.975px'
+                            }}
+                          >
+                            <textPath href={`#${circlePathId}`} startOffset={`${cardData.textRotation}%`}>
+                              {cardData.circularText || 'GATE'}
+                            </textPath>
+                          </text>
+                        </svg>
+                      );
+                    })()}
                   </CardElement>
 
                 {/* BLACK BORDER RING - Middle ring with black border (200x200px) */}
@@ -1959,7 +1950,7 @@ Examples:
                   className={`white-border-ring white-border-ring-${cardData.type}`}
                                       style={{
                       width: cardData.fullArt ? `${186 * scale}px` : `${280 * scale}px`,
-                      height: cardData.fullArt ? `${186 * scale}px` : `${270 * scale}px`,
+                      height: cardData.fullArt ? `${186 * scale}px` : `${280 * scale}px`,
                       borderRadius: '50%',
                       border: cardData.fullArt ? `${18 * scale}px solid black` : `${65 * scale}px solid black`,
                       display: 'flex',
@@ -2073,12 +2064,14 @@ Examples:
               className="card-triangle-left bottom-border-left"
               style={{
                 position: 'absolute',
-                bottom: cardData.fullArt ? `${-200 * scale}px` : `${57 * scale}px`,
-                left: cardData.fullArt ? `${-200 * scale}px` : `${55 * scale}px`,
+                // Snap to whole pixels to avoid 1px seams on retina/mobile and in html2canvas exports.
+                // A tiny overlap (1px) keeps the corner filled even with anti-aliasing near the rounded border.
+                bottom: cardData.fullArt ? `${px(-200)}px` : `${px(57) - 1}px`,
+                left: cardData.fullArt ? `${px(-200)}px` : `${px(55) - 1}px`,
                 width: 0,
                 height: 0,
-                borderLeft: `${150 * scale}px solid black`,
-                borderTop: `${150 * scale}px solid transparent`,
+                borderLeft: `${px(150) + 1}px solid black`,
+                borderTop: `${px(150) + 1}px solid transparent`,
                 display: 'block',
                 visibility: 'visible',
                 opacity: 1
@@ -2090,12 +2083,12 @@ Examples:
               className="card-triangle-right bottom-border-right"
               style={{
                 position: 'absolute',
-                bottom: cardData.fullArt ? `${-200 * scale}px` : `${57 * scale}px`,
-                right: cardData.fullArt ? `${-200 * scale}px` : `${55 * scale}px`,
+                bottom: cardData.fullArt ? `${px(-200)}px` : `${px(57) - 1}px`,
+                right: cardData.fullArt ? `${px(-200)}px` : `${px(55) - 1}px`,
                 width: 0,
                 height: 0,
-                borderRight: `${150 * scale}px solid black`,
-                borderTop: `${150 * scale}px solid transparent`,
+                borderRight: `${px(150) + 1}px solid black`,
+                borderTop: `${px(150) + 1}px solid transparent`,
                 display: 'block',
                 visibility: 'visible',
                 opacity: 1

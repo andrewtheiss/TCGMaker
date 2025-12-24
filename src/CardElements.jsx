@@ -7,11 +7,11 @@ const CardElements = ({
   CardElement, 
   cardColors, 
   helveticaFont, 
-  textShadowStyle, 
+  textShadowStyle: _textShadowStyle, 
   scale, 
   cardWidth,
   mode = 'classic', // 'classic', 'modern', 'minimal'
-  updateCardData
+  updateCardData: _updateCardData
 }) => {
   
   // Define mode-specific styles - all modes are same as classic for now

@@ -1,6 +1,8 @@
 import React from 'react';
 
 const CardBorder = ({ cardData, CardElement, scale }) => {
+  const px = (n) => Math.round(n * scale);
+
   return (
     <>
       {/* Card Border - positioned absolutely to the outer edge */}
@@ -14,11 +16,11 @@ const CardBorder = ({ cardData, CardElement, scale }) => {
             bottom: 0,
             left: 0,
             backgroundColor: 'transparent',
-            borderTop: `${56 * scale}px solid black`,
-            borderLeft: `${56 * scale}px solid black`,
-            borderRight: `${56 * scale}px solid black`,
-            borderBottom: `${51 * scale}px solid black`,
-            borderRadius: `${64 * scale}px`,
+            borderTop: `${px(56)}px solid black`,
+            borderLeft: `${px(56)}px solid black`,
+            borderRight: `${px(56)}px solid black`,
+            borderBottom: `${px(51)}px solid black`,
+            borderRadius: `${px(64)}px`,
             zIndex: 10,
             pointerEvents: 'none'
           }} 
@@ -35,9 +37,9 @@ const CardBorder = ({ cardData, CardElement, scale }) => {
               bottom: 0,
               left: 0,
               right: 0,
-              height: `${92 * scale}px`,
+              height: `${px(92)}px`,
               backgroundColor: 'black',
-              borderRadius: `0 0 ${64 * scale}px ${64 * scale}px`,
+              borderRadius: `0 0 ${px(64)}px ${px(64)}px`,
               zIndex: 15,
               pointerEvents: 'auto'
             }} 
