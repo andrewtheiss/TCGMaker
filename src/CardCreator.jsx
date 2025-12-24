@@ -1595,7 +1595,8 @@ Examples:
           ref={cardRef}
           style={{
             position: 'relative',
-            backgroundColor: 'black',
+            // Full-art should bleed to the edge; avoid black showing through (e.g. from transparent pixels).
+            backgroundColor: (showCardBack || !cardData.fullArt) ? 'black' : 'transparent',
             borderRadius: `${64 * scale}px`,
             overflow: 'hidden',
             width: `${cardWidth * scale}px`,
@@ -2056,55 +2057,57 @@ Examples:
             </CardElement>
           </div>
 
-          {/* Bottom diagonal corners - absolutely positioned independent container */}
-          <div 
-            className={`card-corner-triangles card-corner-triangles-${cardData.type}`}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              pointerEvents: 'none',
-              zIndex: 25
-            }}
-          >
-            {/* Left triangle using CSS borders for better cross-platform compatibility */}
+          {/* Bottom diagonal corners - disabled in full-art (should be fully off-card) */}
+          {!cardData.fullArt && (
             <div 
-              className="card-triangle-left bottom-border-left"
+              className={`card-corner-triangles card-corner-triangles-${cardData.type}`}
               style={{
                 position: 'absolute',
-                // Snap to whole pixels to avoid 1px seams on retina/mobile and in html2canvas exports.
-                // A tiny overlap (1px) keeps the corner filled even with anti-aliasing near the rounded border.
-                bottom: cardData.fullArt ? `${px(-200)}px` : `${px(57) - 1}px`,
-                left: cardData.fullArt ? `${px(-200)}px` : `${px(55) - 1}px`,
-                width: 0,
-                height: 0,
-                borderLeft: `${px(150) + 1}px solid black`,
-                borderTop: `${px(150) + 1}px solid transparent`,
-                display: 'block',
-                visibility: 'visible',
-                opacity: 1
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                pointerEvents: 'none',
+                zIndex: 25
               }}
-            />
-            
-            {/* Right triangle using CSS borders for better cross-platform compatibility */}
-            <div 
-              className="card-triangle-right bottom-border-right"
-              style={{
-                position: 'absolute',
-                bottom: cardData.fullArt ? `${px(-200)}px` : `${px(57) - 1}px`,
-                right: cardData.fullArt ? `${px(-200)}px` : `${px(55) - 1}px`,
-                width: 0,
-                height: 0,
-                borderRight: `${px(150) + 1}px solid black`,
-                borderTop: `${px(150) + 1}px solid transparent`,
-                display: 'block',
-                visibility: 'visible',
-                opacity: 1
-              }}
-            />
-          </div>
+            >
+              {/* Left triangle using CSS borders for better cross-platform compatibility */}
+              <div 
+                className="card-triangle-left bottom-border-left"
+                style={{
+                  position: 'absolute',
+                  // Snap to whole pixels to avoid 1px seams on retina/mobile and in html2canvas exports.
+                  // A tiny overlap (1px) keeps the corner filled even with anti-aliasing near the rounded border.
+                  bottom: `${px(57) - 1}px`,
+                  left: `${px(55) - 1}px`,
+                  width: 0,
+                  height: 0,
+                  borderLeft: `${px(150) + 1}px solid black`,
+                  borderTop: `${px(150) + 1}px solid transparent`,
+                  display: 'block',
+                  visibility: 'visible',
+                  opacity: 1
+                }}
+              />
+              
+              {/* Right triangle using CSS borders for better cross-platform compatibility */}
+              <div 
+                className="card-triangle-right bottom-border-right"
+                style={{
+                  position: 'absolute',
+                  bottom: `${px(57) - 1}px`,
+                  right: `${px(55) - 1}px`,
+                  width: 0,
+                  height: 0,
+                  borderRight: `${px(150) + 1}px solid black`,
+                  borderTop: `${px(150) + 1}px solid transparent`,
+                  display: 'block',
+                  visibility: 'visible',
+                  opacity: 1
+                }}
+              />
+            </div>
+          )}
           
 
           
