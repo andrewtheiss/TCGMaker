@@ -108,6 +108,7 @@ export default function OverlayImageEditorModal({
     display: 'flex',
     flexDirection: isMobile ? 'column' : 'row',
     boxShadow: '0 12px 40px rgba(0,0,0,0.45)',
+    boxSizing: 'border-box',
   };
 
   const headerStyle = {
@@ -118,6 +119,7 @@ export default function OverlayImageEditorModal({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
+    boxSizing: 'border-box',
   };
 
   const buttonBase = {
@@ -154,13 +156,18 @@ export default function OverlayImageEditorModal({
 
   const controlsStyle = {
     width: isMobile ? '100%' : 320,
-    padding: 12,
+    padding: isMobile ? 10 : 12,
     color: 'white',
     backgroundColor: '#0b1220',
     borderTop: isMobile ? '1px solid rgba(255,255,255,0.08)' : 'none',
     borderLeft: isMobile ? 'none' : '1px solid rgba(255,255,255,0.08)',
-    position: isMobile ? 'sticky' : 'relative',
+    position: isMobile ? 'relative' : 'relative',
     bottom: 0,
+    boxSizing: 'border-box',
+    // On very short phones, allow the controls to scroll instead of overflowing the viewport.
+    maxHeight: isMobile ? '48vh' : 'none',
+    overflowY: isMobile ? 'auto' : 'visible',
+    WebkitOverflowScrolling: 'touch',
   };
 
   const cropAreaWrapperStyle = {

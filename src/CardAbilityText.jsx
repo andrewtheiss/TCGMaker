@@ -6,7 +6,8 @@ const CardAbilityText = ({
   CardElement, 
   currentMode, 
   scale, 
-  helveticaFont
+  helveticaFont,
+  isExporting = false
 }) => {
   // Split text into lines and group them for different rendering
   const renderTextContent = () => {
@@ -57,7 +58,7 @@ const CardAbilityText = ({
 
             return (
               <div key={index} style={containerStyle}>
-                {parseFormattedText(lineData.content, baseTextStyle)}
+                {parseFormattedText(lineData.content, baseTextStyle, { isExporting })}
               </div>
             );
           })}
@@ -71,7 +72,7 @@ const CardAbilityText = ({
         ...baseTextStyle,
         margin: '-5px 0px'
       }}>
-        {parseFormattedText(cardData.textBox, baseTextStyle)}
+        {parseFormattedText(cardData.textBox, baseTextStyle, { isExporting })}
       </div>
     );
   };

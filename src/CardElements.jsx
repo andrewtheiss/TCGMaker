@@ -11,7 +11,8 @@ const CardElements = ({
   scale, 
   cardWidth,
   mode = 'classic', // 'classic', 'modern', 'minimal'
-  updateCardData: _updateCardData
+  updateCardData: _updateCardData,
+  isExporting = false
 }) => {
   
   // Define mode-specific styles - all modes are same as classic for now
@@ -178,6 +179,7 @@ const CardElements = ({
         currentMode={currentMode}
         scale={scale}
         helveticaFont={helveticaFont}
+        isExporting={isExporting}
       />
 
       {/* Card Stats Component */}

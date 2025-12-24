@@ -2,11 +2,28 @@ import React from 'react';
 import { textFormattingConfig } from './textFormattingConfig';
 
 // Parse text and return JSX elements with formatting applied
-export const parseFormattedText = (text, baseStyle = {              paddingBottom: '3px'}) => {
+export const parseFormattedText = (text, baseStyle = {}, options = {}) => {
   if (!text) return null;
+  const { isExporting = false } = options;
 
   // Set a compact line height for keyword elements
-  const keywordLineHeight = '1.0';
+  const keywordLineHeight = 1;
+
+  const getFontSizeMultiplier = (keywordFontSize) => {
+    if (typeof keywordFontSize === 'number') return keywordFontSize;
+    if (typeof keywordFontSize === 'string') {
+      const parsed = Number.parseFloat(keywordFontSize);
+      return Number.isFinite(parsed) ? parsed : 1;
+    }
+    return 1;
+  };
+
+  const getPxNumber = (value) => {
+    if (typeof value === 'number') return value;
+    if (typeof value !== 'string') return null;
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
 
   // Split text by newlines first, then process each line
   const lines = text.split('\n');
@@ -19,6 +36,7 @@ export const parseFormattedText = (text, baseStyle = {              paddingBotto
       // Check if this part is a keyword token
       const keywordConfig = textFormattingConfig.keywords[part.toLowerCase()];
       if (keywordConfig) {
+        const keywordFontScale = getFontSizeMultiplier(keywordConfig.fontSize);
         // Special handling for tap image
         if (keywordConfig.isImage) {
           return (
@@ -121,7 +139,7 @@ export const parseFormattedText = (text, baseStyle = {              paddingBotto
                   left: '50%',
                   transform: 'translate(-50%, -50%)',
                   color: keywordConfig.color,
-                  fontSize: `calc(${baseStyle.fontSize || '1em'} * ${keywordConfig.fontSize || '0.9'})`,
+                  fontSize: `calc(${baseStyle.fontSize || '1em'} * ${keywordFontScale})`,
                   fontWeight: keywordConfig.fontWeight,
                   textShadow: keywordConfig.textShadow || 'none',
                   whiteSpace: 'nowrap',
@@ -135,19 +153,71 @@ export const parseFormattedText = (text, baseStyle = {              paddingBotto
         }
         
         // Regular keyword handling
+        const baseFontSizePx = getPxNumber(baseStyle.fontSize);
+        const keywordFontSizePx = baseFontSizePx ? baseFontSizePx * keywordFontScale : null;
+        // Export centering: html2canvas can shift glyphs within the line box.
+        // For export, render the pill as a fixed-height container and absolutely center the text inside it.
+        const exportPillHeightPx = keywordFontSizePx ? Math.max(12, Math.round(keywordFontSizePx * 1.35)) : null;
+        const exportPillHeight = exportPillHeightPx ? `${exportPillHeightPx}px` : undefined;
+
+        const regularKeywordOuterStyle = {
+          display: isExporting ? 'inline-block' : 'inline-flex',
+          alignItems: isExporting ? undefined : 'center',
+          justifyContent: isExporting ? undefined : 'center',
+          position: isExporting ? 'relative' : undefined,
+          verticalAlign: 'middle',
+          margin: '0px 2px 0px 0px',
+          ...keywordConfig,
+          height: isExporting ? exportPillHeight : undefined,
+          lineHeight: isExporting ? exportPillHeight : keywordLineHeight,
+          fontSize: `calc(${baseStyle.fontSize || '1em'} * ${keywordFontScale})`,
+          textShadow: 'none',
+          // Browser: symmetric vertical padding looks best.
+          // Export: let the fixed height + absolute centering handle vertical alignment.
+          paddingTop: isExporting ? undefined : '2px',
+          paddingBottom: isExporting ? undefined : '2px'
+        };
+
+        if (isExporting) {
+          return (
+            <span key={partIndex} style={regularKeywordOuterStyle}>
+              {/*
+                Keep a flow-layout "sizer" so the pill auto-sizes to the text width.
+                The visible label is absolutely centered for stable html2canvas exports.
+              */}
+              <span
+                style={{
+                  opacity: 0,
+                  whiteSpace: 'nowrap',
+                  pointerEvents: 'none'
+                }}
+              >
+                {keywordConfig.displayText}
+              </span>
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  // Export-only nudge: html2canvas tends to draw glyphs slightly low even when centered.
+                  transform: 'translate(-50%, -50%) translateY(-0.12em)',
+                  display: 'inline-block',
+                  color: keywordConfig.color,
+                  fontWeight: keywordConfig.fontWeight,
+                  textShadow: keywordConfig.textShadow || 'none',
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                  pointerEvents: 'none'
+                }}
+              >
+                {keywordConfig.displayText}
+              </span>
+            </span>
+          );
+        }
+
         return (
-          <span
-            key={partIndex}
-            style={{
-              display: 'inline-block',
-              margin: '0px 2px 0px 0px',
-              lineHeight: keywordLineHeight + 4,
-              ...keywordConfig,
-              fontSize: `calc(${baseStyle.fontSize || '1em'} * ${keywordConfig.fontSize || '1'})`,
-              textShadow: 'none',
-              paddingBottom: '3px'
-            }}
-          >
+          <span key={partIndex} style={regularKeywordOuterStyle}>
             {keywordConfig.displayText}
           </span>
         );

@@ -74,6 +74,7 @@ const CardCreator = () => {
   const [showOverlay, setShowOverlay] = useState(true);
   const [dismissedDefaultOverlay, setDismissedDefaultOverlay] = useState(false);
   const [showCardBack, setShowCardBack] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [backgroundEditorOpen, setBackgroundEditorOpen] = useState(false);
   const [backgroundEditorSrc, setBackgroundEditorSrc] = useState(null);
   const fileInputRef = useRef(null);
@@ -315,6 +316,12 @@ const CardCreator = () => {
   const downloadCard = async () => {
     if (cardRef.current) {
       try {
+        // html2canvas can render text metrics slightly differently than the browser.
+        // Temporarily switch into "export" render mode so we can apply tiny export-only
+        // alignment nudges for perfect PNG output.
+        setIsExporting(true);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
         const canvas = await html2canvas(cardRef.current, {
           scale: 4, // High resolution multiplier - this will scale the actual rendered size
           backgroundColor: null,
@@ -340,6 +347,8 @@ const CardCreator = () => {
       } catch (error) {
         console.error('Error downloading card:', error);
         alert('Error downloading card. Please try again.');
+      } finally {
+        setIsExporting(false);
       }
     }
   };
@@ -1909,7 +1918,8 @@ Examples:
                             fill="transparent"
                             fontWeight="900"
                             stroke="black"
-                            strokeWidth={14}
+                            // 25% thicker outline around circular text (e.g. "ENTITY")
+                            strokeWidth={17.5}
                             strokeLinejoin="round"
                             strokeLinecap="round"
                             style={{
@@ -2337,6 +2347,7 @@ Examples:
             cardWidth={cardWidth}
             mode={cardData.elementMode}
             updateCardData={updateCardData}
+            isExporting={isExporting}
           />
 
           {/* Equipment Description - Only for equipment cards */}
